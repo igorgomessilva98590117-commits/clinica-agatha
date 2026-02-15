@@ -5,8 +5,11 @@ import FormSuccess from './FormSuccess';
 
 interface FormData {
   fullName: string;
-  whatsapp: string;
   birthDate: string;
+  emergencyContactName: string;
+  emergencyContactPhone: string;
+  emergencyContactRelationship: string;
+  emergencyContactNotes: string;
   areaOfInterest: string;
   priorProcedures: string;
   allergies: string;
@@ -15,8 +18,11 @@ interface FormData {
 const BotoxForm: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
     fullName: '',
-    whatsapp: '',
     birthDate: '',
+    emergencyContactName: '',
+    emergencyContactPhone: '',
+    emergencyContactRelationship: '',
+    emergencyContactNotes: '',
     areaOfInterest: '',
     priorProcedures: '',
     allergies: ''

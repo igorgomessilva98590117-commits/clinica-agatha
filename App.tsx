@@ -22,7 +22,7 @@ const serviceConfig: Record<ServiceType, { title: string; description: string }>
   },
   intratermoterapia: {
     title: 'Ficha de Avaliação - Intratermoterapia',
-    description: 'Preencha as informações para sua avaliação de intratermoterapia. Analisaremos sua ficha e entraremos em contato pelo WhatsApp para agendar sua consulta.',
+    description: 'Preencha as informações para sua avaliação de intratermoterapia. Analisaremos sua ficha e entraremos em contato pelo contato de emergência fornecido para agendar sua consulta.',
   },
 };
 

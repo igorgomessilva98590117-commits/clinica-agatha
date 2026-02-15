@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
-import { Send, User, Phone, Calendar, Scissors, Activity, AlertCircle } from 'lucide-react';
+import { Send, Scissors, Activity, AlertCircle } from 'lucide-react';
+import { PersonalDataSection } from './forms/PersonalDataSection';
 
 interface FormData {
   fullName: string;
-  whatsapp: string;
   birthDate: string;
+  emergencyContactName: string;
+  emergencyContactPhone: string;
+  emergencyContactRelationship: string;
+  emergencyContactNotes: string;
   mainComplaint: string;
   hasChemicalHistory: string; // "yes" | "no" | ""
   chemicalDetails: string;
@@ -14,8 +18,11 @@ interface FormData {
 const AnamnesisForm: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
     fullName: '',
-    whatsapp: '',
     birthDate: '',
+    emergencyContactName: '',
+    emergencyContactPhone: '',
+    emergencyContactRelationship: '',
+    emergencyContactNotes: '',
     mainComplaint: '',
     hasChemicalHistory: '',
     chemicalDetails: '',
@@ -54,7 +61,7 @@ const AnamnesisForm: React.FC = () => {
         </div>
         <h3 className="text-2xl font-serif text-brand-800 mb-4">Ficha Enviada com Sucesso</h3>
         <p className="text-brand-700 mb-8 leading-relaxed">
-          Obrigada por enviar suas informações. Nossa equipe irá analisar sua ficha e entraremos em contato pelo WhatsApp fornecido para agendar sua consulta.
+          Obrigada por enviar suas informações. Nossa equipe irá analisar sua ficha e entraremos em contato pelo contato de emergência fornecido para agendar sua consulta.
         </p>
         <button 
           onClick={() => setSubmitted(false)}
@@ -77,59 +84,7 @@ const AnamnesisForm: React.FC = () => {
       <div className="p-6 md:p-10 space-y-10">
         
         {/* Section 1: Personal Data */}
-        <section className="space-y-6">
-          <div className="flex items-center gap-2 mb-2 border-b border-brand-100 pb-2">
-            <User className="w-5 h-5 text-gold-600" />
-            <h3 className="text-lg font-serif font-medium text-brand-800">Dados Pessoais</h3>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="col-span-1 md:col-span-2 space-y-2">
-              <label htmlFor="fullName" className="block text-sm font-medium text-brand-700">Nome Completo</label>
-              <input
-                required
-                type="text"
-                id="fullName"
-                name="fullName"
-                value={formData.fullName}
-                onChange={handleChange}
-                placeholder="Ex: Maria Eduarda Silva"
-                className="w-full px-4 py-3 rounded-lg border border-brand-200 bg-brand-50 focus:bg-white focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none transition-all duration-200 placeholder:text-brand-400"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="whatsapp" className="block text-sm font-medium text-brand-700 flex items-center gap-1">
-                WhatsApp <Phone className="w-3 h-3 text-brand-500" />
-              </label>
-              <input
-                required
-                type="tel"
-                id="whatsapp"
-                name="whatsapp"
-                value={formData.whatsapp}
-                onChange={handleChange}
-                placeholder="(00) 00000-0000"
-                className="w-full px-4 py-3 rounded-lg border border-brand-200 bg-brand-50 focus:bg-white focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none transition-all duration-200 placeholder:text-brand-400"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="birthDate" className="block text-sm font-medium text-brand-700 flex items-center gap-1">
-                Data de Nascimento <Calendar className="w-3 h-3 text-brand-500" />
-              </label>
-              <input
-                required
-                type="date"
-                id="birthDate"
-                name="birthDate"
-                value={formData.birthDate}
-                onChange={handleChange}
-                className="w-full px-4 py-3 rounded-lg border border-brand-200 bg-brand-50 focus:bg-white focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none transition-all duration-200 text-brand-700"
-              />
-            </div>
-          </div>
-        </section>
+        <PersonalDataSection formData={formData} onChange={handleChange} />
 
         {/* Section 2: Main Complaint */}
         <section className="space-y-6">

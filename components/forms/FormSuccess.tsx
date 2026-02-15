@@ -12,7 +12,7 @@ const FormSuccess: React.FC<FormSuccessProps> = ({ onBack }) => (
     </div>
     <h3 className="text-2xl font-serif text-brand-800 mb-4">Ficha Enviada com Sucesso</h3>
     <p className="text-brand-700 mb-8 leading-relaxed">
-      Obrigada por enviar suas informações. Nossa equipe irá analisar sua ficha e entraremos em contato pelo WhatsApp fornecido para agendar sua consulta.
+      Obrigada por enviar suas informações. Nossa equipe irá analisar sua ficha e entraremos em contato pelo contato de emergência fornecido para agendar sua consulta.
     </p>
     <button 
       onClick={onBack}

@@ -5,8 +5,11 @@ import FormSuccess from './FormSuccess';
 
 interface FormData {
   fullName: string;
-  whatsapp: string;
   birthDate: string;
+  emergencyContactName: string;
+  emergencyContactPhone: string;
+  emergencyContactRelationship: string;
+  emergencyContactNotes: string;
   skinType: string;
   concerns: string;
   currentRoutine: string;
@@ -16,8 +19,11 @@ interface FormData {
 const SkinManagementForm: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
     fullName: '',
-    whatsapp: '',
     birthDate: '',
+    emergencyContactName: '',
+    emergencyContactPhone: '',
+    emergencyContactRelationship: '',
+    emergencyContactNotes: '',
     skinType: '',
     concerns: '',
     currentRoutine: '',

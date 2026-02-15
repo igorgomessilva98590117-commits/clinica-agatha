@@ -5,8 +5,11 @@ import FormSuccess from './FormSuccess';
 
 interface FormData {
   fullName: string;
-  whatsapp: string;
   birthDate: string;
+  emergencyContactName: string;
+  emergencyContactPhone: string;
+  emergencyContactRelationship: string;
+  emergencyContactNotes: string;
   treatmentArea: string;
   goal: string;
   priorTreatments: string;
@@ -16,8 +19,11 @@ interface FormData {
 const IntratermotherapyForm: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
     fullName: '',
-    whatsapp: '',
     birthDate: '',
+    emergencyContactName: '',
+    emergencyContactPhone: '',
+    emergencyContactRelationship: '',
+    emergencyContactNotes: '',
     treatmentArea: '',
     goal: '',
     priorTreatments: '',
