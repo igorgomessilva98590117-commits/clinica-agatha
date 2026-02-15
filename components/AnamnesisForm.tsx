@@ -99,7 +99,7 @@ const AnamnesisForm: React.FC = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-brand-50 shadow-xl shadow-brand-600/30 rounded-2xl overflow-hidden border border-brand-200">
+    <form onSubmit={handleSubmit} className="bg-white shadow-xl shadow-brand-600/20 rounded-2xl overflow-hidden border-2 border-brand-200/80">
       
       {/* Progress Line */}
       <div className="h-1 w-full bg-brand-50">

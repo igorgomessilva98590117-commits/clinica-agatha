@@ -353,7 +353,7 @@ function drawTricologiaHeader(page: any, font: any, fontBold: any, startY: numbe
     height: headerH,
     color: colors.brand,
   });
-  page.drawText('DRA. AGATHA', {
+  page.drawText('ÁGATHA SANTOS', {
     x: logoX + 15,
     y: startY - 22,
     size: 14,
@@ -775,7 +775,7 @@ export async function generateTricologiaAnamnesePdf(formData: Record<string, str
   y -= 25;
 
   for (const p of pages) {
-    p.drawText(`Gerado em ${new Date().toLocaleString('pt-BR')} • Dra. Ágatha`, { x: MARGIN, y: 22, size: 7, font: font, color: colors.brand200 });
+    p.drawText(`Gerado em ${new Date().toLocaleString('pt-BR')} • Ágatha Santos`, { x: MARGIN, y: 22, size: 7, font: font, color: colors.brand200 });
   }
 
   const pdfBytes = await pdfDoc.save();

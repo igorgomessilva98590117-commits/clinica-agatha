@@ -72,16 +72,16 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col font-sans bg-brand-50/50">
+    <div className="min-h-screen flex flex-col font-sans bg-gradient-to-b from-brand-50 to-brand-100">
       <Header onDrAgathaClick={handleDrAgathaClick} />
       <ServiceNav activeService={activeService} onSelect={setActiveService} />
 
-      <main className="flex-grow container mx-auto px-4 sm:px-6 py-6 sm:py-8 md:py-12 max-w-3xl safe-area-x">
-        <div className="text-center mb-8 sm:mb-10">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-light text-brand-600 mb-3 sm:mb-4 leading-tight">
+      <main className="flex-grow container mx-auto px-4 sm:px-6 py-8 sm:py-10 md:py-14 max-w-3xl safe-area-x">
+        <div className="text-center mb-10 sm:mb-12">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-semibold text-brand-700 mb-4 sm:mb-5 leading-tight">
             {config.title}
           </h2>
-          <p className="text-brand-700 text-sm sm:text-base max-w-xl mx-auto leading-relaxed px-1">
+          <p className="text-brand-600 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
             {config.description}
           </p>
         </div>

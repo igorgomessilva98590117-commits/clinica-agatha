@@ -17,17 +17,17 @@ const services: { id: ServiceType; label: string; icon: React.ReactNode }[] = [
 
 const ServiceNav: React.FC<ServiceNavProps> = ({ activeService, onSelect }) => {
   return (
-    <nav className="flex flex-wrap justify-center gap-2 py-3 px-4 sm:px-6 bg-brand-600/80 border-b border-gold-500/20 safe-area-x">
+    <nav className="flex flex-wrap justify-center gap-2 py-4 px-4 sm:px-6 bg-gradient-to-b from-brand-600 to-brand-700 border-b-2 border-gold-500/30 safe-area-x shadow-inner">
       {services.map(({ id, label, icon }) => (
         <button
           key={id}
           type="button"
           onClick={() => onSelect(id)}
           className={`
-            flex items-center gap-2 px-3 py-2.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 touch-manipulation min-h-[44px] sm:min-h-0
+            flex items-center gap-2 px-4 py-3 sm:px-5 sm:py-2.5 rounded-xl text-sm font-medium transition-all duration-200 touch-manipulation min-h-[44px] sm:min-h-0
             ${activeService === id 
-              ? 'bg-gold-500 text-brand-900 shadow-md' 
-              : 'text-gold-400 hover:bg-gold-500/20 hover:text-gold-400'}
+              ? 'bg-gold-500 text-brand-900 shadow-lg ring-2 ring-gold-400/50' 
+              : 'text-gold-400 hover:bg-gold-500/25 hover:text-gold-300 border border-gold-500/30'}
           `}
         >
           {icon}

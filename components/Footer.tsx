@@ -2,16 +2,17 @@ import React from 'react';
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-brand-500 border-t border-gold-500/30 py-8 mt-12 safe-area-bottom">
+    <footer className="bg-gradient-to-b from-brand-600 to-brand-500 border-t-2 border-gold-500/40 py-10 mt-16 safe-area-bottom shadow-inner">
       <div className="container mx-auto px-4 sm:px-6 text-center safe-area-x">
-        <p className="text-gold-400 text-sm font-light">
-          &copy; {new Date().getFullYear()} Dra. Ágatha - Estética Avançada e Tricologia. Todos os direitos reservados.
+        <p className="text-gold-400 text-base font-medium">
+          &copy; {new Date().getFullYear()} Ágatha Santos - Estética Avançada e Tricologia
         </p>
-        <div className="mt-2 flex justify-center gap-4 text-xs text-gold-500">
+        <p className="text-gold-500/80 text-sm mt-1">Todos os direitos reservados.</p>
+        <div className="mt-4 flex justify-center gap-6 text-sm text-gold-500 font-medium">
           <span>Ética Médica</span>
-          <span>•</span>
+          <span className="text-gold-500/50">•</span>
           <span>Privacidade</span>
-          <span>•</span>
+          <span className="text-gold-500/50">•</span>
           <span>Ciência</span>
         </div>
       </div>

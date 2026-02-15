@@ -227,7 +227,7 @@ const DrAgathaArea: React.FC<DrAgathaAreaProps> = ({ onLogout }) => {
   const tricologiaContent = (
     <>
       <div className="mb-8 p-6 bg-brand-500 rounded-2xl text-center">
-        <h1 className="text-2xl font-serif text-gold-500 font-bold mb-1">DRA. ÁGATHA</h1>
+        <h1 className="text-2xl font-serif text-gold-500 font-bold mb-1">ÁGATHA SANTOS</h1>
         <p className="text-gold-400 text-sm mb-4">ESTÉTICA AVANÇADA E TRICOLOGIA</p>
         <h2 className="text-lg font-serif text-gold-400 font-medium mb-4">FICHA ANAMNESE - TRICOLOGIA</h2>
         <div className="flex justify-center gap-6 text-gold-400 text-sm">
@@ -425,7 +425,7 @@ const DrAgathaArea: React.FC<DrAgathaAreaProps> = ({ onLogout }) => {
     <div className="min-h-screen flex flex-col font-sans bg-brand-100">
       <header className="bg-brand-500 border-b border-gold-500/30 py-3 px-4 sm:py-4 sm:px-6 safe-area-top">
         <div className="container mx-auto flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          <h1 className="text-lg sm:text-xl font-serif text-gold-500 font-semibold">Dra. Ágatha - Área Restrita</h1>
+          <h1 className="text-lg sm:text-xl font-serif text-gold-500 font-semibold">Ágatha Santos - Área Restrita</h1>
           <button
             type="button"
             onClick={onLogout}
@@ -470,7 +470,7 @@ const DrAgathaArea: React.FC<DrAgathaAreaProps> = ({ onLogout }) => {
         {formContent}
 
         <p className="text-center text-xs text-brand-500 mt-8">
-          Dra. Ágatha - Estética Avançada e Tricologia
+          Ágatha Santos - Estética Avançada e Tricologia
         </p>
       </main>
     </div>
