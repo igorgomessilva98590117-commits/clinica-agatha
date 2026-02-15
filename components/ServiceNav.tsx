@@ -27,7 +27,7 @@ const ServiceNav: React.FC<ServiceNavProps> = ({ activeService, onSelect }) => {
             flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
             ${activeService === id 
               ? 'bg-gold-500 text-brand-900 shadow-md' 
-              : 'text-gold-400 hover:bg-gold-500/20 hover:text-gold-300'}
+              : 'text-gold-400 hover:bg-gold-500/20 hover:text-gold-400'}
           `}
         >
           {icon}

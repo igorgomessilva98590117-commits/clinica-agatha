@@ -5,7 +5,7 @@ const Footer: React.FC = () => {
     <footer className="bg-brand-500 border-t border-gold-500/30 py-8 mt-12">
       <div className="container mx-auto px-4 text-center">
         <p className="text-gold-400 text-sm font-light">
-          &copy; {new Date().getFullYear()} Dra. Agatha Tricologia. Todos os direitos reservados.
+          &copy; {new Date().getFullYear()} Agatha Santos - Estética Avançada e Tricologia. Todos os direitos reservados.
         </p>
         <div className="mt-2 flex justify-center gap-4 text-xs text-gold-500">
           <span>Ética Médica</span>

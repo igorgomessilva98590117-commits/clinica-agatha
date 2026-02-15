@@ -6,6 +6,8 @@ import AnamnesisForm from './components/AnamnesisForm';
 import BotoxForm from './components/forms/BotoxForm';
 import SkinManagementForm from './components/forms/SkinManagementForm';
 import IntratermotherapyForm from './components/forms/IntratermotherapyForm';
+import DrAgathaLogin from './components/DrAgathaLogin';
+import DrAgathaArea from './components/DrAgathaArea';
 
 const serviceConfig: Record<ServiceType, { title: string; description: string }> = {
   tricologia: {
@@ -28,7 +30,31 @@ const serviceConfig: Record<ServiceType, { title: string; description: string }>
 
 const App: React.FC = () => {
   const [activeService, setActiveService] = useState<ServiceType>('tricologia');
+  const [showDrAgathaLogin, setShowDrAgathaLogin] = useState(false);
+  const [isDrAgathaLoggedIn, setIsDrAgathaLoggedIn] = useState(false);
+
   const config = serviceConfig[activeService];
+
+  const handleDrAgathaClick = () => {
+    if (isDrAgathaLoggedIn) {
+      setIsDrAgathaLoggedIn(false);
+    } else {
+      setShowDrAgathaLogin(true);
+    }
+  };
+
+  const handleDrAgathaLoginSuccess = () => {
+    setShowDrAgathaLogin(false);
+    setIsDrAgathaLoggedIn(true);
+  };
+
+  const handleDrAgathaLogout = () => {
+    setIsDrAgathaLoggedIn(false);
+  };
+
+  if (isDrAgathaLoggedIn) {
+    return <DrAgathaArea onLogout={handleDrAgathaLogout} />;
+  }
 
   const renderForm = () => {
     switch (activeService) {
@@ -47,7 +73,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col font-sans">
-      <Header />
+      <Header onDrAgathaClick={handleDrAgathaClick} />
       <ServiceNav activeService={activeService} onSelect={setActiveService} />
 
       <main className="flex-grow container mx-auto px-4 py-8 md:py-12 max-w-3xl">
@@ -64,6 +90,13 @@ const App: React.FC = () => {
       </main>
 
       <Footer />
+
+      {showDrAgathaLogin && (
+        <DrAgathaLogin
+          onSuccess={handleDrAgathaLoginSuccess}
+          onClose={() => setShowDrAgathaLogin(false)}
+        />
+      )}
     </div>
   );
 };

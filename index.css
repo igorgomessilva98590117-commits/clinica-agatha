@@ -1,0 +1,17 @@
+/* Desfoque suave nas bordas do logo para transição sem diferença de cor */
+.logo-blend {
+  mask-image: radial-gradient(
+    ellipse 92% 92% at 50% 50%,
+    black 60%,
+    transparent 100%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 92% 92% at 50% 50%,
+    black 60%,
+    transparent 100%
+  );
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+  mask-position: center;
+  -webkit-mask-position: center;
+}
