@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Send, Scissors, Activity, AlertCircle } from 'lucide-react';
+import { Send, Scissors, Activity, AlertCircle, Download, Mail } from 'lucide-react';
 import { PersonalDataSection } from './forms/PersonalDataSection';
+import { generateFormPdf, getEmailContent } from '../utils/pdfGenerator';
 
 interface FormData {
   fullName: string;
@@ -54,6 +55,11 @@ const AnamnesisForm: React.FC = () => {
   };
 
   if (submitted) {
+    const handleDownloadPdf = async () => await generateFormPdf(formData, 'Tricologia');
+    const handleSendEmail = () => {
+      const { subject, body } = getEmailContent(formData, 'Tricologia');
+      window.location.href = `mailto:?subject=${subject}&body=${body}`;
+    };
     return (
       <div className="bg-brand-50 p-10 rounded-xl shadow-lg border border-brand-200 text-center animate-fade-in">
         <div className="w-16 h-16 bg-brand-100 rounded-full flex items-center justify-center mx-auto mb-6 border border-brand-200">
@@ -62,6 +68,25 @@ const AnamnesisForm: React.FC = () => {
         <h3 className="text-2xl font-serif text-brand-800 mb-4">Ficha Enviada com Sucesso</h3>
         <p className="text-brand-700 mb-8 leading-relaxed">
           Obrigada por enviar suas informações. Nossa equipe irá analisar sua ficha e entraremos em contato pelo contato de emergência fornecido para agendar sua consulta.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
+          <button
+            onClick={handleDownloadPdf}
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white font-medium rounded-lg transition-colors"
+          >
+            <Download className="w-5 h-5" />
+            Baixar PDF da Ficha
+          </button>
+          <button
+            onClick={handleSendEmail}
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gold-500 hover:bg-gold-600 text-brand-900 font-medium rounded-lg transition-colors"
+          >
+            <Mail className="w-5 h-5" />
+            Enviar por Email
+          </button>
+        </div>
+        <p className="text-xs text-brand-500 mb-4">
+          Baixe o PDF e anexe ao email, ou use o botão acima para abrir seu cliente de email com os dados preenchidos.
         </p>
         <button 
           onClick={() => setSubmitted(false)}

@@ -49,7 +49,7 @@ const BotoxForm: React.FC = () => {
   const inputClass = "w-full px-4 py-3 rounded-lg border border-brand-200 bg-brand-50 focus:bg-white focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none transition-all duration-200 placeholder:text-brand-400";
   const textareaClass = `${inputClass} resize-none`;
 
-  if (submitted) return <FormSuccess onBack={() => setSubmitted(false)} />;
+  if (submitted) return <FormSuccess onBack={() => setSubmitted(false)} formData={formData} serviceName="Botox" />;
 
   return (
     <form onSubmit={handleSubmit} className="bg-brand-50 shadow-xl shadow-brand-600/30 rounded-2xl overflow-hidden border border-brand-200">
