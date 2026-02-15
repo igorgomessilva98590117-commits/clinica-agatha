@@ -1,0 +1,175 @@
+import React, { useState } from 'react';
+import { Send, Target, MapPin, AlertCircle } from 'lucide-react';
+import { PersonalDataSection } from './PersonalDataSection';
+import FormSuccess from './FormSuccess';
+
+interface FormData {
+  fullName: string;
+  whatsapp: string;
+  birthDate: string;
+  treatmentArea: string;
+  goal: string;
+  priorTreatments: string;
+  contraindications: string;
+}
+
+const IntratermotherapyForm: React.FC = () => {
+  const [formData, setFormData] = useState<FormData>({
+    fullName: '',
+    whatsapp: '',
+    birthDate: '',
+    treatmentArea: '',
+    goal: '',
+    priorTreatments: '',
+    contraindications: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setTimeout(() => {
+      console.log('Intratermotherapy Form:', formData);
+      setIsSubmitting(false);
+      setSubmitted(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 1500);
+  };
+
+  const inputClass = "w-full px-4 py-3 rounded-lg border border-brand-200 bg-brand-50 focus:bg-white focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none transition-all duration-200 placeholder:text-brand-400";
+  const textareaClass = `${inputClass} resize-none`;
+
+  if (submitted) return <FormSuccess onBack={() => setSubmitted(false)} />;
+
+  return (
+    <form onSubmit={handleSubmit} className="bg-brand-50 shadow-xl shadow-brand-600/30 rounded-2xl overflow-hidden border border-brand-200">
+      <div className="h-1 w-full bg-brand-50">
+        <div className="h-full bg-gradient-to-r from-gold-400 to-brand-500 w-1/3 rounded-r-full"></div>
+      </div>
+
+      <div className="p-6 md:p-10 space-y-10">
+        <PersonalDataSection formData={formData} onChange={handleChange} />
+
+        <section className="space-y-6">
+          <div className="flex items-center gap-2 mb-2 border-b border-brand-100 pb-2">
+            <MapPin className="w-5 h-5 text-gold-600" />
+            <h3 className="text-lg font-serif font-medium text-brand-800">Área de Tratamento</h3>
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="treatmentArea" className="block text-sm font-medium text-brand-700">
+              Qual área deseja tratar com intratermoterapia?
+            </label>
+            <select
+              id="treatmentArea"
+              name="treatmentArea"
+              value={formData.treatmentArea}
+              onChange={handleChange}
+              required
+              className={`${inputClass} text-brand-700 appearance-none`}
+            >
+              <option value="" disabled>Selecione</option>
+              <option value="couro-cabeludo">Couro cabeludo</option>
+              <option value="rosto">Rosto</option>
+              <option value="corpo">Corpo</option>
+              <option value="celulite">Celulite/Gordura localizada</option>
+              <option value="estrias">Estrias</option>
+              <option value="outra">Outra</option>
+            </select>
+          </div>
+        </section>
+
+        <section className="space-y-6">
+          <div className="flex items-center gap-2 mb-2 border-b border-brand-100 pb-2">
+            <Target className="w-5 h-5 text-gold-600" />
+            <h3 className="text-lg font-serif font-medium text-brand-800">Objetivo</h3>
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="goal" className="block text-sm font-medium text-brand-700">
+              Qual seu principal objetivo com o tratamento?
+            </label>
+            <textarea
+              id="goal"
+              name="goal"
+              value={formData.goal}
+              onChange={handleChange}
+              rows={3}
+              placeholder="Ex: Redução de gordura localizada, tratamento de queda capilar, melhora da celulite..."
+              className={textareaClass}
+            />
+          </div>
+        </section>
+
+        <section className="space-y-6">
+          <div className="flex items-center gap-2 mb-2 border-b border-brand-100 pb-2">
+            <Target className="w-5 h-5 text-gold-600" />
+            <h3 className="text-lg font-serif font-medium text-brand-800">Tratamentos Anteriores</h3>
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="priorTreatments" className="block text-sm font-medium text-brand-700">
+              Já realizou procedimentos similares (mesoterapia, intradermoterapia)?
+            </label>
+            <textarea
+              id="priorTreatments"
+              name="priorTreatments"
+              value={formData.priorTreatments}
+              onChange={handleChange}
+              rows={2}
+              placeholder="Descreva brevemente, se aplicável..."
+              className={textareaClass}
+            />
+          </div>
+        </section>
+
+        <section className="space-y-6">
+          <div className="flex items-center gap-2 mb-2 border-b border-brand-100 pb-2">
+            <AlertCircle className="w-5 h-5 text-gold-600" />
+            <h3 className="text-lg font-serif font-medium text-brand-800">Contraindicações</h3>
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="contraindications" className="block text-sm font-medium text-brand-700">
+              Gestação, lactação, alergias, uso de anticoagulantes ou outras condições que devemos saber?
+            </label>
+            <textarea
+              id="contraindications"
+              name="contraindications"
+              value={formData.contraindications}
+              onChange={handleChange}
+              rows={3}
+              placeholder="Informe qualquer condição relevante..."
+              className={textareaClass}
+            />
+          </div>
+        </section>
+
+        <div className="pt-6">
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full flex items-center justify-center gap-3 bg-brand-500 hover:bg-brand-600 active:bg-brand-700 text-white text-lg font-medium tracking-wide py-4 rounded-lg shadow-lg shadow-brand-600/40 transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
+          >
+            {isSubmitting ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                <span>Enviando...</span>
+              </>
+            ) : (
+              <>
+                <span>Enviar Ficha de Intratermoterapia</span>
+                <Send className="w-5 h-5" />
+              </>
+            )}
+          </button>
+          <p className="text-center text-xs text-brand-500 mt-4">Seus dados estão seguros e serão utilizados apenas para fins clínicos.</p>
+        </div>
+      </div>
+    </form>
+  );
+};
+
+export default IntratermotherapyForm;
