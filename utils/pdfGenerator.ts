@@ -25,6 +25,9 @@ const colors = {
   brand700: rgb(46 / 255, 1 / 255, 20 / 255),
   brand800: rgb(36 / 255, 1 / 255, 16 / 255),
   gold: rgb(194 / 255, 168 / 255, 119 / 255),
+  beige: rgb(250 / 255, 243 / 255, 235 / 255),
+  beigeDark: rgb(235 / 255, 220 / 255, 200 / 255),
+  lineGray: rgb(0.7, 0.7, 0.7),
 };
 
 const labelMap: Record<string, string> = {
@@ -325,94 +328,158 @@ export async function generateFormPdf(
   URL.revokeObjectURL(url);
 }
 
-const BOX = '[ ]'; // Marcador de checkbox (ASCII para compatibilidade PDF)
-
-function drawTricologiaHeader(page: any, font: any, fontBold: any, y: number): number {
-  page.drawRectangle({
-    x: 0,
-    y: y - 70,
-    width: PAGE_WIDTH,
-    height: 70,
-    color: colors.brand,
-  });
-  page.drawText('AGATHA SANTOS', {
-    x: MARGIN,
-    y: y - 26,
-    size: 18,
-    font: fontBold,
-    color: colors.gold,
-  });
-  page.drawText('ESTÉTICA AVANÇADA E TRICOLOGIA', {
-    x: MARGIN,
-    y: y - 42,
-    size: 9,
-    font: font,
-    color: colors.gold,
-  });
-  page.drawText('FICHA ANAMNESE - TRICOLOGIA', {
-    x: MARGIN,
-    y: y - 56,
-    size: 11,
-    font: fontBold,
-    color: colors.gold,
-  });
-  page.drawText('Contato: (31) 99200-3849  •  Instagram: @biomed.aga', {
-    x: MARGIN,
-    y: y - 66,
-    size: 8,
-    font: font,
-    color: colors.gold,
-  });
-  return y - 85;
-}
-
+const BOX = '[ ]';
 const CHECK = '[X]';
 
-function drawSimNao(page: any, font: any, fontBold: any, label: string, x: number, y: number, value?: string): number {
-  page.drawText(label, { x, y, size: FONT_SIZE_LABEL, font: fontBold, color: colors.brand700 });
-  const simX = PAGE_WIDTH - MARGIN - 110;
-  const simText = value === 'sim' ? `${CHECK} Sim  ${BOX} Nao` : value === 'nao' ? `${BOX} Sim  ${CHECK} Nao` : `${BOX} Sim  ${BOX} Nao`;
-  page.drawText(simText, { x: simX, y, size: FONT_SIZE_LABEL, font: font, color: colors.brand800 });
-  return y - LINE_HEIGHT - 2;
+function drawTricologiaHeader(page: any, font: any, fontBold: any, startY: number): number {
+  const headerH = 52;
+  const logoW = 140;
+  const titleW = 220;
+  const logoX = MARGIN;
+  const titleX = (PAGE_WIDTH - titleW) / 2;
+  const contactX = PAGE_WIDTH - MARGIN - 95;
+
+  page.drawRectangle({
+    x: 0,
+    y: startY - headerH,
+    width: logoX + logoW + 20,
+    height: headerH,
+    color: colors.brand,
+  });
+  page.drawRectangle({
+    x: titleX - 10,
+    y: startY - headerH,
+    width: titleW + 20,
+    height: headerH,
+    color: colors.brand,
+  });
+  page.drawText('DRA. AGATHA', {
+    x: logoX + 15,
+    y: startY - 22,
+    size: 14,
+    font: fontBold,
+    color: rgb(1, 1, 1),
+  });
+  page.drawText('ESTÉTICA AVANÇADA E TRICOLOGIA', {
+    x: logoX + 15,
+    y: startY - 36,
+    size: 7,
+    font: font,
+    color: rgb(1, 1, 1),
+  });
+  page.drawText('FICHA ANAMNESE', {
+    x: titleX + 15,
+    y: startY - 22,
+    size: 12,
+    font: fontBold,
+    color: rgb(1, 1, 1),
+  });
+  page.drawText('TRICOLOGIA', {
+    x: titleX + 15,
+    y: startY - 36,
+    size: 10,
+    font: fontBold,
+    color: rgb(1, 1, 1),
+  });
+  page.drawText('(31) 99200-3849', {
+    x: contactX,
+    y: startY - 18,
+    size: 8,
+    font: font,
+    color: colors.brand,
+  });
+  page.drawText('@biomed.aga', {
+    x: contactX,
+    y: startY - 32,
+    size: 8,
+    font: font,
+    color: colors.brand,
+  });
+  return startY - headerH - 15;
 }
 
-function drawFieldLine(page: any, font: any, fontBold: any, label: string, x: number, y: number, value?: string): number {
-  page.drawText(label, { x, y, size: FONT_SIZE_LABEL, font: fontBold, color: colors.brand700 });
-  y -= LABEL_HEIGHT + 2;
+function drawUnderline(page: any, x: number, y: number, len: number, color = colors.lineGray) {
+  page.drawLine({ start: { x, y }, end: { x: x + len, y }, thickness: 0.4, color });
+}
+
+const ROW_H = 14;
+const SIM_NAO_OPT_X = PAGE_WIDTH - MARGIN - 68;
+
+function drawSimNao(page: any, font: any, _fontBold: any, label: string, x: number, y: number, _col2X: number, value?: string): number {
+  const lines = wrapText(label.replace(/\s+/g, ' ').trim(), 58);
+  for (const ln of lines) {
+    page.drawText(ln, { x, y, size: 8, font: font, color: colors.brand800 });
+    y -= 10;
+  }
+  y -= 2;
+  const s = value === 'sim' ? CHECK : BOX;
+  const n = value === 'nao' ? CHECK : BOX;
+  page.drawText(`${s} Sim    ${n} Não`, { x: SIM_NAO_OPT_X, y, size: 8, font: font, color: colors.brand800 });
+  return y - ROW_H;
+}
+
+function drawFieldInline(page: any, font: any, fontBold: any, label: string, x: number, y: number, underlineLen: number, value?: string): number {
+  page.drawText(`${label} `, { x, y, size: 8, font: font, color: colors.brand800 });
+  const textX = x + font.widthOfTextAtSize(label + ' ', 8);
   const text = (value || '').trim();
   if (text) {
-    const lines = wrapText(text, MAX_CHARS);
+    const short = text.length > 50 ? text.substring(0, 47) + '...' : text;
+    page.drawText(short, { x: textX, y, size: 8, font: font, color: colors.brand800 });
+  } else {
+    drawUnderline(page, textX, y + 1, underlineLen);
+  }
+  return y - 12;
+}
+
+function drawFieldLine(page: any, font: any, fontBold: any, label: string, x: number, y: number, endX: number, value?: string): number {
+  page.drawText(label, { x, y, size: 8, font: font, color: colors.brand800 });
+  y -= 10;
+  const text = (value || '').trim();
+  if (text) {
+    const lines = wrapText(text, 55);
     for (const line of lines) {
-      page.drawText(line, { x, y, size: FONT_SIZE, font: font, color: colors.brand800 });
-      y -= LINE_HEIGHT;
+      page.drawText(line, { x, y, size: 8, font: font, color: colors.brand800 });
+      y -= 10;
     }
     return y - 4;
   }
-  page.drawLine({
-    start: { x, y: y + 4 },
-    end: { x: PAGE_WIDTH - MARGIN, y: y + 4 },
-    thickness: 0.3,
-    color: colors.brand200,
-  });
+  drawUnderline(page, x, y + 2, endX - x);
   return y - 6;
 }
 
-function drawCheckOptions(page: any, font: any, label: string, options: string[], x: number, y: number, selected?: string): number {
-  page.drawText(label, { x, y, size: FONT_SIZE_LABEL, font: font, color: colors.brand700 });
-  y -= LINE_HEIGHT;
-  const sel = (selected || '').split(',').map(s => s.trim()).filter(Boolean);
+function drawRadio(page: any, font: any, label: string, options: string[], x: number, y: number, selected?: string): number {
+  page.drawText(label, { x, y, size: 8, font: font, color: colors.brand800 });
+  y -= 10;
+  const sel = (selected || '').toLowerCase();
   let optX = x;
   for (const opt of options) {
-    if (optX > PAGE_WIDTH - MARGIN - 80) {
+    if (optX > PAGE_WIDTH - MARGIN - 90) {
       optX = x;
-      y -= LINE_HEIGHT;
+      y -= 10;
     }
-    const isSel = sel.some(s => opt.toLowerCase().includes(s.toLowerCase()) || s.toLowerCase().includes(opt.toLowerCase().split(' ')[0]));
-    const prefix = isSel ? CHECK : BOX;
-    page.drawText(`${prefix} ${opt.substring(0, 12)}`, { x: optX, y, size: FONT_SIZE_LABEL, font: font, color: colors.brand800 });
-    optX += 55;
+    const mark = sel.includes(opt.toLowerCase().substring(0, 4)) ? CHECK : BOX;
+    page.drawText(`${mark} ${opt}  `, { x: optX, y, size: 8, font: font, color: colors.brand800 });
+    optX += 50;
   }
-  return y - 8;
+  return y - ROW_H;
+}
+
+function drawCheckMulti(page: any, font: any, label: string, options: string[], x: number, y: number, selected?: string): number {
+  page.drawText(label, { x, y, size: 8, font: font, color: colors.brand800 });
+  y -= 10;
+  const sel = (selected || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+  let optX = x;
+  for (const opt of options) {
+    if (optX > PAGE_WIDTH - MARGIN - 75) {
+      optX = x;
+      y -= 10;
+    }
+    const isSel = sel.some(s => opt.toLowerCase().includes(s) || s.includes(opt.toLowerCase().split(' ')[0]));
+    const mark = isSel ? CHECK : BOX;
+    page.drawText(`${mark} ${opt}  `, { x: optX, y, size: 8, font: font, color: colors.brand800 });
+    optX += 56;
+  }
+  return y - ROW_H;
 }
 
 export async function generateTricologiaAnamnesePdf(formData: Record<string, string> = {}): Promise<void> {
@@ -430,196 +497,285 @@ export async function generateTricologiaAnamnesePdf(formData: Record<string, str
       pages.push(pdfDoc.addPage([PAGE_WIDTH, PAGE_HEIGHT]));
       pageIdx++;
       page = pages[pageIdx];
-      y = PAGE_HEIGHT - MARGIN;
-      page.drawText('AGATHA SANTOS - FICHA ANAMNESE TRICOLOGIA', {
-        x: MARGIN, y, size: 8, font: font, color: colors.brand200,
-      });
-      y -= 20;
+      y = PAGE_HEIGHT - MARGIN - 15;
     }
   };
 
-  y = drawTricologiaHeader(page, font, fontBold, y);
+  y = drawTricologiaHeader(page, font, fontBold, PAGE_HEIGHT - MARGIN);
 
-  const drawSectionTitle = (title: string) => {
-    needsNewPage(40);
-    page.drawText(title, { x: MARGIN, y, size: FONT_SIZE_SECTION, font: fontBold, color: colors.brand800 });
-    y -= FONT_SIZE_SECTION + 4;
-    page.drawLine({
-      start: { x: MARGIN, y },
-      end: { x: PAGE_WIDTH - MARGIN, y },
-      thickness: 0.5,
-      color: colors.brand200,
+  const drawBanner = (title: string, h = 18) => {
+    needsNewPage(h + 20);
+    page.drawRectangle({
+      x: MARGIN - 5,
+      y: y - h,
+      width: CONTENT_WIDTH + 10,
+      height: h,
+      color: colors.beige,
+      borderColor: colors.brand200,
+      borderWidth: 0.3,
     });
-    y -= 12;
+    page.drawText(title, {
+      x: MARGIN + 8,
+      y: y - h + 5,
+      size: 10,
+      font: fontBold,
+      color: colors.brand800,
+    });
+    y -= h + 10;
   };
 
-  drawSectionTitle('1. Dados Pessoais');
-  y = drawFieldLine(page, font, fontBold, 'Nome completo:', MARGIN, y, d('nomeCompleto'));
-  y = drawFieldLine(page, font, fontBold, 'Data nascimento:', MARGIN, y, d('dataNascimento'));
-  y = drawFieldLine(page, font, fontBold, 'Idade:', MARGIN, y, d('idade'));
-  needsNewPage(30);
-  const sexoMark = d('sexo').toLowerCase();
-  page.drawText(`Sexo: ${sexoMark.includes('fem') ? CHECK : BOX} Femin.  ${sexoMark.includes('masc') ? CHECK : BOX} Masc.`, { x: MARGIN, y, size: FONT_SIZE_LABEL, font: font, color: colors.brand700 });
-  y -= LINE_HEIGHT + 6;
-  y = drawFieldLine(page, font, fontBold, 'CPF:', MARGIN, y, d('cpf'));
-  y = drawFieldLine(page, font, fontBold, 'Profissao:', MARGIN, y, d('profissao'));
-  y = drawFieldLine(page, font, fontBold, 'Telefone:', MARGIN, y, d('telefone'));
-  y = drawFieldLine(page, font, fontBold, 'E-mail:', MARGIN, y, d('email'));
-  y = drawFieldLine(page, font, fontBold, 'Cidade/Endereco:', MARGIN, y, d('cidadeEndereco'));
+  const drawPanel = (h: number, color = colors.beige) => {
+    page.drawRectangle({
+      x: MARGIN - 5,
+      y: y - h,
+      width: CONTENT_WIDTH + 10,
+      height: h,
+      color,
+      borderColor: colors.brand200,
+      borderWidth: 0.3,
+    });
+  };
 
-  drawSectionTitle('2. Anamnese Capilar (Queixas e Sintomas)');
-  y = drawFieldLine(page, font, fontBold, 'Queixa principal:', MARGIN, y, d('queixaPrincipal'));
-  needsNewPage(30);
-  page.drawText('Sintomas no couro cabeludo:', { x: MARGIN, y, size: FONT_SIZE_LABEL, font: fontBold, color: colors.brand700 });
-  y -= LINE_HEIGHT;
-  y = drawSimNao(page, font, fontBold, 'Coceira:', MARGIN, y, d('coceira'));
-  y = drawSimNao(page, font, fontBold, 'Dor:', MARGIN, y, d('dor'));
-  y = drawSimNao(page, font, fontBold, 'Ardencia/Queimacao:', MARGIN, y, d('ardencia'));
-  page.drawText('Sobre a Queda:', { x: MARGIN, y, size: FONT_SIZE_LABEL, font: fontBold, color: colors.brand700 });
-  y -= LINE_HEIGHT;
-  y = drawSimNao(page, font, fontBold, 'Queda acentuada?:', MARGIN, y, d('quedaAcentuada'));
-  y = drawFieldLine(page, font, fontBold, 'Ha quanto tempo?:', MARGIN, y, d('quedaQuantoTempo'));
-  y = drawSimNao(page, font, fontBold, 'Falta de sensibilidade:', MARGIN, y, d('faltaSensibilidade'));
-  y = drawSimNao(page, font, fontBold, 'Queda cessou e voltou?:', MARGIN, y, d('quedaVoltou'));
-  y = drawSimNao(page, font, fontBold, 'Sensibilidade exacerbada:', MARGIN, y, d('sensibilidadeExacerbada'));
-  page.drawText('Observacoes Visuais:', { x: MARGIN, y, size: FONT_SIZE_LABEL, font: fontBold, color: colors.brand700 });
-  y -= LINE_HEIGHT;
-  y = drawSimNao(page, font, fontBold, 'Nota presenca de fios novos?:', MARGIN, y, d('fiosNovos'));
-  y = drawSimNao(page, font, fontBold, 'Presenca de caspa/descamacao:', MARGIN, y, d('caspa'));
-  y = drawSimNao(page, font, fontBold, 'Houve perda de volume?:', MARGIN, y, d('perdaVolume'));
-  const afinH = d('afinamentoHaste').toLowerCase();
-  page.drawText(`Afinamento da haste: ${afinH.includes('presente') ? CHECK : BOX} Presente  ${afinH.includes('ausente') ? CHECK : BOX} Ausente`, { x: MARGIN, y, size: FONT_SIZE_LABEL, font: font, color: colors.brand700 });
-  y -= LINE_HEIGHT + 6;
-  y = drawCheckOptions(page, font, 'Tipo de cabelo:', ['Oleoso 24h', 'Oleoso 48h+', 'Seco'], MARGIN, y, d('tipoCabelo'));
-  y = drawFieldLine(page, font, fontBold, 'Frequencia de lavagem:', MARGIN, y, d('frequenciaLavagem'));
-  page.drawText('Historico:', { x: MARGIN, y, size: FONT_SIZE_LABEL, font: fontBold, color: colors.brand700 });
-  y -= LINE_HEIGHT;
-  y = drawSimNao(page, font, fontBold, 'Perda de pelos em outras partes?:', MARGIN, y, d('perdaOutrosPelos'));
-  y = drawSimNao(page, font, fontBold, 'Diagnostico previo:', MARGIN, y, d('diagnosticoPrevio'));
-  y = drawSimNao(page, font, fontBold, 'Tratamento previo:', MARGIN, y, d('tratamentoPrevio'));
-  y = drawSimNao(page, font, fontBold, 'Tratamento orientado por profissional?:', MARGIN, y, d('tratamentoOrientado'));
-  y = drawSimNao(page, font, fontBold, 'Obteve resultados?:', MARGIN, y, d('obteveResultados'));
-  y = drawSimNao(page, font, fontBold, 'Evento marcante antecedeu a queda?:', MARGIN, y, d('eventoMarcante'));
+  drawBanner('1. Dados Pessoais', 22);
+  const dadosH = 175;
+  drawPanel(dadosH);
+  let rowY = y - 12;
+  const fld = (lbl: string, val: string, w: number) => {
+    page.drawText(lbl, { x: MARGIN + 5, y: rowY, size: 8, font: font, color: colors.brand800 });
+    if (val) page.drawText(val, { x: MARGIN + 7, y: rowY - 12, size: 8, font: font, color: colors.brand800 });
+    else drawUnderline(page, MARGIN + 7, rowY - 10, Math.min(w, CONTENT_WIDTH - 20));
+    rowY -= 20;
+  };
+  fld('Nome completo:', d('nomeCompleto'), 300);
+  fld('Data nascimento:', d('dataNascimento'), 100);
+  fld('Idade:', d('idade'), 50);
+  const sexo = d('sexo').toLowerCase();
+  page.drawText(`Sexo: ${sexo.includes('fem') ? CHECK : BOX} Femin.  ${sexo.includes('masc') ? CHECK : BOX} Masc.`, { x: MARGIN + 5, y: rowY, size: 8, font: font, color: colors.brand800 });
+  rowY -= 20;
+  fld('CPF:', d('cpf'), 120);
+  fld('Profissão:', d('profissao'), 150);
+  fld('Telefone:', d('telefone'), 100);
+  fld('E-mail:', d('email'), 180);
+  fld('Cidade/Endereço:', d('cidadeEndereco'), 400);
+  y = rowY - 20;
 
-  drawSectionTitle('3. Historico de Saude e Familiar');
-  y = drawSimNao(page, font, fontBold, 'Possui problema de saude hoje:', MARGIN, y, d('problemaSaude'));
-  y = drawFieldLine(page, font, fontBold, 'Se sim, qual:', MARGIN, y, d('problemaSaudeQual'));
-  y = drawSimNao(page, font, fontBold, 'Casos de calvicie na familia:', MARGIN, y, d('calvicieFamilia'));
-  y = drawFieldLine(page, font, fontBold, 'Se sim, qual parentesco:', MARGIN, y, d('calvicieParentesco'));
-  y = drawSimNao(page, font, fontBold, 'Doenca cronica:', MARGIN, y, d('doencaCronica'));
-  y = drawFieldLine(page, font, fontBold, 'Se sim, qual:', MARGIN, y, d('doencaCronicaQual'));
-  const doencas = d('doencasCronicasTipos').toLowerCase();
-  page.drawText(`${doencas.includes('hipert') ? CHECK : BOX} Hipertensao  ${doencas.includes('diab') ? CHECK : BOX} Diabetes  ${doencas.includes('arrit') ? CHECK : BOX} Arritmia  ${doencas.includes('dislip') ? CHECK : BOX} Dislipidemia`, { x: MARGIN, y, size: FONT_SIZE_LABEL, font: font, color: colors.brand700 });
-  y -= LINE_HEIGHT + 8;
+  drawBanner('2. Anamnese Capilar (Queixas e Sintomas)', 20);
+  needsNewPage(100);
 
-  drawSectionTitle('4. Fisiologia e Habitos');
-  const intest = d('intestino').toLowerCase();
-  page.drawText(`Funcionamento intestino: ${intest.includes('regular') ? CHECK : BOX} Regular  ${intest.includes('constip') ? CHECK : BOX} Constipado`, { x: MARGIN, y, size: FONT_SIZE_LABEL, font: font, color: colors.brand700 });
-  y -= LINE_HEIGHT + 2;
-  y = drawFieldLine(page, font, fontBold, 'Se constipado, qual frequencia:', MARGIN, y, d('intestinoFrequencia'));
-  y = drawSimNao(page, font, fontBold, 'Uso de fonte termica (secador/chapinha):', MARGIN, y, d('fonteTermica'));
-  y = drawSimNao(page, font, fontBold, 'Disturbio circulacao:', MARGIN, y, d('disturbioCirculacao'));
-  y = drawSimNao(page, font, fontBold, 'Desregulacao hormonal:', MARGIN, y, d('desregulacaoHormonal'));
-  y = drawFieldLine(page, font, fontBold, 'Se sim, qual:', MARGIN, y, d('desregulacaoHormonalQual'));
-  y = drawSimNao(page, font, fontBold, 'Historico tumores/nodulos malignos:', MARGIN, y, d('tumores'));
-
-  drawSectionTitle('5. Procedimentos Capilares');
-  y = drawSimNao(page, font, fontBold, 'Faz alisamento quimico:', MARGIN, y, d('alisamento'));
-  y = drawFieldLine(page, font, fontBold, 'Se sim, qual frequencia:', MARGIN, y, d('alisamentoFrequencia'));
-  y = drawFieldLine(page, font, fontBold, 'Quais cosmeticos utiliza:', MARGIN, y, d('cosmeticos'));
-  y = drawSimNao(page, font, fontBold, 'Penteados que causam tracao:', MARGIN, y, d('penteadosTracao'));
-  y = drawFieldLine(page, font, fontBold, 'Se sim, qual:', MARGIN, y, d('penteadosQual'));
-  y = drawSimNao(page, font, fontBold, 'Sente dor pela tracao:', MARGIN, y, d('dorTracao'));
-  y = drawSimNao(page, font, fontBold, 'Fez transplante capilar:', MARGIN, y, d('transplante'));
-
-  drawSectionTitle('6. Medicamentos e Vicios');
-  y = drawSimNao(page, font, fontBold, 'Uso de contraceptivo:', MARGIN, y, d('contraceptivo'));
-  y = drawFieldLine(page, font, fontBold, 'Se sim, qual:', MARGIN, y, d('contraceptivoQual'));
-  const bebida = d('bebidaAlcoolica').toLowerCase();
-  page.drawText(`Bebida alcoolica: ${bebida.includes('diar') ? CHECK : BOX} Diariamente  ${bebida.includes('soc') ? CHECK : BOX} Socialmente  ${bebida.includes('nao') || bebida === 'não' ? CHECK : BOX} Nao`, { x: MARGIN, y, size: FONT_SIZE_LABEL, font: font, color: colors.brand700 });
-  y -= LINE_HEIGHT + 6;
-  y = drawSimNao(page, font, fontBold, 'Medicamento continuo:', MARGIN, y, d('medicamentoContinuo'));
-  y = drawSimNao(page, font, fontBold, 'Medicamento no momento:', MARGIN, y, d('medicamentoMomento'));
-  y = drawFieldLine(page, font, fontBold, 'Se sim, qual:', MARGIN, y, d('medicamentoQual'));
-  y = drawSimNao(page, font, fontBold, 'Fuma:', MARGIN, y, d('fuma'));
-  y = drawFieldLine(page, font, fontBold, 'Ha quanto tempo?:', MARGIN, y, d('fumaQuantoTempo'));
-  y = drawSimNao(page, font, fontBold, 'Pratica exercicios fisicos:', MARGIN, y, d('exercicios'));
-  y = drawFieldLine(page, font, fontBold, 'Se sim, qual frequencia:', MARGIN, y, d('exerciciosFrequencia'));
-
-  drawSectionTitle('7. Sono e Emocional');
-  y = drawSimNao(page, font, fontBold, 'Problemas com o sono:', MARGIN, y, d('problemasSono'));
-  y = drawFieldLine(page, font, fontBold, 'Horas de sono por noite:', MARGIN, y, d('horasSono'));
-  page.drawText('Perfil Emocional:', { x: MARGIN, y, size: FONT_SIZE_LABEL, font: fontBold, color: colors.brand700 });
-  y -= LINE_HEIGHT;
-  y = drawSimNao(page, font, fontBold, 'Estressada:', MARGIN, y, d('estressada'));
-  y = drawSimNao(page, font, fontBold, 'Ansiosa:', MARGIN, y, d('ansiosa'));
-  y = drawSimNao(page, font, fontBold, 'Depressiva:', MARGIN, y, d('depressiva'));
-  y = drawSimNao(page, font, fontBold, 'Tratamento psiquico:', MARGIN, y, d('tratamentoPsiquico'));
-
-  drawSectionTitle('8. Historico Medico Adicional');
-  y = drawSimNao(page, font, fontBold, 'Alergia:', MARGIN, y, d('alergia'));
-  y = drawFieldLine(page, font, fontBold, 'Se sim, qual:', MARGIN, y, d('alergiaQual'));
-  y = drawSimNao(page, font, fontBold, 'Cirurgia recente:', MARGIN, y, d('cirurgiaRecente'));
-  y = drawSimNao(page, font, fontBold, '(Mulheres) Gestante ou lactante:', MARGIN, y, d('gestanteLactante'));
-  const ciclo = d('cicloMenstrual').toLowerCase();
-  page.drawText(`Ciclo Menstrual: ${ciclo.includes('regular') ? CHECK : BOX} Regular  ${ciclo.includes('irreg') ? CHECK : BOX} Irregular`, { x: MARGIN, y, size: FONT_SIZE_LABEL, font: font, color: colors.brand700 });
-  y -= LINE_HEIGHT + 2;
-  const fluxo = d('fluxoMenstrual').toLowerCase();
-  page.drawText(`Fluxo menstrual: ${fluxo.includes('intenso') ? CHECK : BOX} Intenso  ${fluxo.includes('moderado') ? CHECK : BOX} Moderado  ${fluxo.includes('baixo') ? CHECK : BOX} Baixo`, { x: MARGIN, y, size: FONT_SIZE_LABEL, font: font, color: colors.brand700 });
-  y -= LINE_HEIGHT + 8;
-
-  drawSectionTitle('9. Exame Fisico e Tricoscopia');
-  y = drawFieldLine(page, font, fontBold, '1. Alimentacao:', MARGIN, y, d('alimentacao'));
-  y = drawFieldLine(page, font, fontBold, '2. Exame Fisico:', MARGIN, y, d('exameFisico'));
-  page.drawText('TRICOSCOPIA', { x: MARGIN, y, size: FONT_SIZE_SECTION, font: fontBold, color: colors.brand800 });
-  y -= LINE_HEIGHT + 4;
-  const anomH = d('anomaliasHaste').toLowerCase();
-  page.drawText(`Anomalias/Fragilidades haste: ${anomH.includes('ausente') ? CHECK : BOX} Ausente  ${anomH.includes('presente') ? CHECK : BOX} Presente`, { x: MARGIN, y, size: FONT_SIZE_LABEL, font: font, color: colors.brand700 });
-  y -= LINE_HEIGHT + 2;
-  const ostios = d('ostiosFoliculares').toLowerCase();
-  page.drawText('Ostios foliculares:', { x: MARGIN, y, size: FONT_SIZE_LABEL, font: fontBold, color: colors.brand700 });
-  y -= LINE_HEIGHT;
-  page.drawText(`${ostios.includes('normal') ? CHECK : BOX} Normal  ${ostios.includes('preto') ? CHECK : BOX} Preto  ${ostios.includes('branco') ? CHECK : BOX} Branco  ${ostios.includes('amarelo') ? CHECK : BOX} Amarelo  ${ostios.includes('vermelho') ? CHECK : BOX} Vermelho  ${ostios.includes('cinza') ? CHECK : BOX} Cinza/azulado`, { x: MARGIN, y, size: FONT_SIZE_LABEL, font: font, color: colors.brand800 });
-  y -= LINE_HEIGHT + 4;
-  const desc = d('descamacao').toLowerCase();
-  page.drawText('Epiderme - Descamacao:', { x: MARGIN, y, size: FONT_SIZE_LABEL, font: fontBold, color: colors.brand700 });
-  y -= LINE_HEIGHT;
-  page.drawText(`${desc.includes('normal') && !desc.includes('difusa') && !desc.includes('local') && !desc.includes('perif') ? CHECK : BOX} Normal  ${desc.includes('difusa') ? CHECK : BOX} Difusa  ${desc.includes('localizada') ? CHECK : BOX} Localizada  ${desc.includes('perif') ? CHECK : BOX} Perifolicular`, { x: MARGIN, y, size: FONT_SIZE_LABEL, font: font, color: colors.brand800 });
-  y -= LINE_HEIGHT + 4;
-  const color = d('coloracao').toLowerCase();
-  page.drawText('Coloracao:', { x: MARGIN, y, size: FONT_SIZE_LABEL, font: fontBold, color: colors.brand700 });
-  y -= LINE_HEIGHT;
-  page.drawText(`${color.includes('castanha') ? CHECK : BOX} Castanha  ${color.includes('rosa') ? CHECK : BOX} Rosa  ${color.includes('vermelha') ? CHECK : BOX} Vermelha  ${color.includes('amarela') ? CHECK : BOX} Amarela  ${color.includes('branca') ? CHECK : BOX} Branca  ${color.includes('azul') || color.includes('violaceo') ? CHECK : BOX} Azul/violaceo`, { x: MARGIN, y, size: FONT_SIZE_LABEL, font: font, color: colors.brand800 });
-  y -= LINE_HEIGHT + 6;
-  y = drawFieldLine(page, font, fontBold, 'CONCLUSAO:', MARGIN, y, d('conclusao'));
-
-  drawSectionTitle('10. Declaracao e Assinatura');
-  const decl = '"Eu declaro que todas as informações fornecidas nesta ficha são verdadeiras e completas, e autorizo a utilização destes dados para fins de planejamento e execução de tratamentos estéticos na clínica."';
-  const words = decl.split(/\s+/);
-  let line = '';
-  const declLines: string[] = [];
-  for (const w of words) {
-    if ((line + (line ? ' ' : '') + w).length <= 68) {
-      line = line ? line + ' ' + w : w;
+  const row = (lbl: string, val: string, len: number) => {
+    page.drawText(lbl, { x: MARGIN, y, size: 8, font: font, color: colors.brand800 });
+    if (val) {
+      const ln = wrapText(val, 65);
+      for (const l of ln) {
+        y -= 10;
+        page.drawText(l, { x: MARGIN + 2, y, size: 8, font: font, color: colors.brand800 });
+      }
     } else {
-      if (line) declLines.push(line);
-      line = w;
+      drawUnderline(page, MARGIN + 2, y - 7, Math.min(len, CONTENT_WIDTH - 4));
+      y -= 10;
     }
+    y -= ROW_H;
+  };
+
+  row('Queixa principal:', d('queixaPrincipal'), 400);
+  y = drawSimNao(page, font, fontBold, 'Coceira:', MARGIN, y, 0, d('coceira'));
+  y = drawSimNao(page, font, fontBold, 'Dor:', MARGIN, y, 0, d('dor'));
+  y = drawSimNao(page, font, fontBold, 'Ardência, queimação:', MARGIN, y, 0, d('ardencia'));
+  y = drawSimNao(page, font, fontBold, 'Queda acentuada?', MARGIN, y, 0, d('quedaAcentuada'));
+  row('Há quanto tempo?', d('quedaQuantoTempo'), 120);
+  y = drawSimNao(page, font, fontBold, 'Falta de sensibilidade:', MARGIN, y, 0, d('faltaSensibilidade'));
+  y = drawSimNao(page, font, fontBold, 'Tiveram períodos que a queda cessou e depois voltou?', MARGIN, y, 0, d('quedaVoltou'));
+  y = drawSimNao(page, font, fontBold, 'Sensibilidade exacerbada:', MARGIN, y, 0, d('sensibilidadeExacerbada'));
+  y = drawSimNao(page, font, fontBold, 'Nota presença de fios novos?', MARGIN, y, 0, d('fiosNovos'));
+  y = drawSimNao(page, font, fontBold, 'Presença de caspa/descamação:', MARGIN, y, 0, d('caspa'));
+  y = drawSimNao(page, font, fontBold, 'Houve perda de volume?', MARGIN, y, 0, d('perdaVolume'));
+  const afin = d('afinamentoHaste').toLowerCase();
+  page.drawText(`Afinamento da haste: ${afin.includes('presente') ? CHECK : BOX} Presente  ${afin.includes('ausente') ? CHECK : BOX} Ausente`, { x: MARGIN, y, size: 8, font: font, color: colors.brand800 });
+  y -= ROW_H + 4;
+  page.drawText('Tipo de cabelo e couro cabeludo:', { x: MARGIN, y, size: 8, font: font, color: colors.brand800 });
+  y -= 10;
+  const tpo = d('tipoCabelo').toLowerCase();
+  page.drawText(`${tpo.includes('24h') ? CHECK : BOX} Oleoso em 24h  ${tpo.includes('48h') ? CHECK : BOX} Oleoso em 48h ou mais  ${tpo.includes('seco') ? CHECK : BOX} Seco`, { x: MARGIN, y, size: 8, font: font, color: colors.brand800 });
+  y -= ROW_H + 4;
+  row('Frequência de lavagem:', d('frequenciaLavagem'), 150);
+  y = drawSimNao(page, font, fontBold, 'Há perda de pelos em outras partes do corpo?', MARGIN, y, 0, d('perdaOutrosPelos'));
+  y = drawSimNao(page, font, fontBold, 'Diagnóstico prévio:', MARGIN, y, 0, d('diagnosticoPrevio'));
+  y = drawSimNao(page, font, fontBold, 'Tratamento prévio:', MARGIN, y, 0, d('tratamentoPrevio'));
+  y = drawSimNao(page, font, fontBold, 'O tratamento realizado foi orientado por um profissional:', MARGIN, y, 0, d('tratamentoOrientado'));
+  y = drawSimNao(page, font, fontBold, 'Obteve resultados?', MARGIN, y, 0, d('obteveResultados'));
+  y = drawSimNao(page, font, fontBold, 'Houve algum evento marcante que antecedeu a queda?', MARGIN, y, 0, d('eventoMarcante'));
+  y = drawSimNao(page, font, fontBold, 'Possui algum problema de saúde hoje:', MARGIN, y, 0, d('problemaSaude'));
+  row('Se sim, qual:', d('problemaSaudeQual'), 250);
+  y = drawSimNao(page, font, fontBold, 'Casos de calvície na família:', MARGIN, y, 0, d('calvicieFamilia'));
+  row('Se sim, qual parentesco:', d('calvicieParentesco'), 150);
+  y = drawSimNao(page, font, fontBold, 'Doença crônica:', MARGIN, y, 0, d('doencaCronica'));
+  row('Se sim, qual:', d('doencaCronicaQual'), 150);
+  y = drawCheckMulti(page, font, 'Se doente crônico:', ['Hipertensão', 'Diabetes', 'Arritmia', 'Dislipidemia'], MARGIN, y, d('doencasCronicasTipos'));
+  y -= 8;
+
+  drawBanner('3. Histórico de Saúde • 4–8. Fisiologia, Procedimentos, Medicamentos, Sono, Histórico Médico', 22);
+  needsNewPage(80);
+
+  const row2 = (lbl: string, val: string, len: number) => {
+    page.drawText(lbl, { x: MARGIN, y, size: 8, font: font, color: colors.brand800 });
+    if (val) {
+      const ln = wrapText(val, 65);
+      for (const l of ln) {
+        y -= 10;
+        page.drawText(l, { x: MARGIN + 2, y, size: 8, font: font, color: colors.brand800 });
+      }
+    } else {
+      drawUnderline(page, MARGIN + 2, y - 7, Math.min(len, CONTENT_WIDTH - 4));
+      y -= 10;
+    }
+    y -= ROW_H;
+  };
+
+  y = drawRadio(page, font, 'Funcionamento do intestino:', ['Regular', 'Constipado'], MARGIN, y, d('intestino'));
+  row2('Se constipado, qual frequência:', d('intestinoFrequencia'), 150);
+  y = drawSimNao(page, font, fontBold, 'Uso de fonte térmica:', MARGIN, y, 0, d('fonteTermica'));
+  row2('Se sim, qual frequência:', '', 120);
+  y = drawSimNao(page, font, fontBold, 'Distúrbio da circulação (trombose, embolia, hemorragia):', MARGIN, y, 0, d('disturbioCirculacao'));
+  y = drawSimNao(page, font, fontBold, 'Desregulação hormonal:', MARGIN, y, 0, d('desregulacaoHormonal'));
+  row2('Se sim, qual:', d('desregulacaoHormonalQual'), 150);
+  y = drawSimNao(page, font, fontBold, 'Histórico de tumores ou nódulos malignos - Pessoal ou familiar:', MARGIN, y, 0, d('tumores'));
+  row2('Se sim, qual:', '', 80);
+  y = drawSimNao(page, font, fontBold, 'Faz alisamento químico:', MARGIN, y, 0, d('alisamento'));
+  row2('Se sim, qual frequência:', d('alisamentoFrequencia'), 120);
+  row2('Quais cosméticos utiliza no cabelo:', d('cosmeticos'), 300);
+  y = drawSimNao(page, font, fontBold, 'Usa penteados que causam tração:', MARGIN, y, 0, d('penteadosTracao'));
+  row2('Se sim, qual:', d('penteadosQual'), 150);
+  y = drawSimNao(page, font, fontBold, 'Sente dor decorrente dessa tração:', MARGIN, y, 0, d('dorTracao'));
+  y = drawSimNao(page, font, fontBold, 'Fez transplante capilar:', MARGIN, y, 0, d('transplante'));
+  y = drawSimNao(page, font, fontBold, 'Uso de contraceptivo:', MARGIN, y, 0, d('contraceptivo'));
+  row2('Se sim, qual:', d('contraceptivoQual'), 150);
+  const beb = d('bebidaAlcoolica').toLowerCase();
+  page.drawText(`Bebida alcoólica: ${beb.includes('diar') ? CHECK : BOX} Diariamente  ${beb.includes('soc') ? CHECK : BOX} Socialmente  ${beb.includes('nao') || beb === 'não' ? CHECK : BOX} Não`, { x: MARGIN, y, size: 8, font: font, color: colors.brand800 });
+  y -= ROW_H + 4;
+  y = drawSimNao(page, font, fontBold, 'Faz uso de medicamento contínuo:', MARGIN, y, 0, d('medicamentoContinuo'));
+  row2('Há quanto tempo?', '', 100);
+  y = drawSimNao(page, font, fontBold, 'Está fazendo uso de algum medicamento no momento:', MARGIN, y, 0, d('medicamentoMomento'));
+  row2('Se sim, qual:', d('medicamentoQual'), 250);
+  y = drawSimNao(page, font, fontBold, 'Fuma:', MARGIN, y, 0, d('fuma'));
+  row2('Há quanto tempo?', d('fumaQuantoTempo'), 100);
+  y = drawSimNao(page, font, fontBold, 'Pratica exercícios físicos:', MARGIN, y, 0, d('exercicios'));
+  row2('Se sim, qual frequência:', d('exerciciosFrequencia'), 120);
+  y = drawSimNao(page, font, fontBold, 'Possui problemas relacionado ao sono:', MARGIN, y, 0, d('problemasSono'));
+  row2('Quantidade de horas de sono por noite:', d('horasSono'), 80);
+  y = drawSimNao(page, font, fontBold, 'Se julga uma pessoa estressada:', MARGIN, y, 0, d('estressada'));
+  y = drawSimNao(page, font, fontBold, 'Ansiosa:', MARGIN, y, 0, d('ansiosa'));
+  y = drawSimNao(page, font, fontBold, 'Depressiva:', MARGIN, y, 0, d('depressiva'));
+  y = drawSimNao(page, font, fontBold, 'Faz algum tratamento de cunho psíquico:', MARGIN, y, 0, d('tratamentoPsiquico'));
+  y = drawSimNao(page, font, fontBold, 'Alergia:', MARGIN, y, 0, d('alergia'));
+  row2('Se sim, qual:', d('alergiaQual'), 150);
+  y = drawSimNao(page, font, fontBold, 'Cirurgia recente:', MARGIN, y, 0, d('cirurgiaRecente'));
+  row2('Se sim, qual:', '', 80);
+  y = drawSimNao(page, font, fontBold, 'Gestante ou lactante:', MARGIN, y, 0, d('gestanteLactante'));
+  y = drawRadio(page, font, 'Ciclo Menstrual:', ['Regular', 'Irregular'], MARGIN, y, d('cicloMenstrual'));
+  y = drawRadio(page, font, 'Fluxo menstrual:', ['Intenso', 'Moderado', 'Baixo'], MARGIN, y, d('fluxoMenstrual'));
+  y -= 8;
+
+  drawBanner('9. Exame Físico e Tricoscopia', 20);
+  needsNewPage(120);
+  page.drawText('1. Alimentação', { x: MARGIN, y, size: 9, font: fontBold, color: colors.brand800 });
+  y -= 12;
+  for (let i = 0; i < 4; i++) {
+    const ln = wrapText(d('alimentacao'), 70)[i] || '';
+    if (ln) page.drawText(ln, { x: MARGIN, y, size: 8, font: font, color: colors.brand800 });
+    else drawUnderline(page, MARGIN, y + 2, CONTENT_WIDTH);
+    y -= 12;
   }
-  if (line) declLines.push(line);
-  let declY = y;
+  y -= 8;
+  page.drawText('2. Exame Físico', { x: MARGIN, y, size: 9, font: fontBold, color: colors.brand800 });
+  y -= 12;
+  for (let i = 0; i < 4; i++) {
+    const ln = wrapText(d('exameFisico'), 70)[i] || '';
+    if (ln) page.drawText(ln, { x: MARGIN, y, size: 8, font: font, color: colors.brand800 });
+    else drawUnderline(page, MARGIN, y + 2, CONTENT_WIDTH);
+    y -= 12;
+  }
+  y -= 15;
+
+  drawBanner('TRICOSCOPIA', 14);
+  needsNewPage(120);
+  const anom = d('anomaliasHaste').toLowerCase();
+  page.drawText('Anomalias/Fragilidades da haste:', { x: MARGIN, y, size: 8, font: font, color: colors.brand800 });
+  y -= 10;
+  page.drawText(`${anom.includes('ausente') ? CHECK : BOX} Ausente  ${anom.includes('presente') ? CHECK : BOX} Presente`, { x: MARGIN, y, size: 8, font: font, color: colors.brand800 });
+  y -= ROW_H + 4;
+  page.drawText('Óstios foliculares:', { x: MARGIN, y, size: 8, font: font, color: colors.brand800 });
+  y -= 10;
+  const ost = d('ostiosFoliculares').toLowerCase();
+  const ostOpts = [`${ost.includes('normal') ? CHECK : BOX} Normal`, `${ost.includes('preto') ? CHECK : BOX} Preto`, `${ost.includes('branco') ? CHECK : BOX} Branco`, `${ost.includes('amarelo') ? CHECK : BOX} Amarelo`, `${ost.includes('vermelho') ? CHECK : BOX} Vermelho`, `${ost.includes('cinza') ? CHECK : BOX} Cinza/azulado`];
+  let ox = MARGIN;
+  for (const o of ostOpts) {
+    if (ox + 80 > PAGE_WIDTH - MARGIN) { ox = MARGIN; y -= 10; }
+    page.drawText(`${o}  `, { x: ox, y, size: 8, font: font, color: colors.brand800 });
+    ox += 70;
+  }
+  y -= ROW_H + 4;
+  page.drawText('Epiderme peri/interfolicular - Descamação:', { x: MARGIN, y, size: 8, font: font, color: colors.brand800 });
+  y -= 10;
+  const desc = d('descamacao').toLowerCase();
+  const descOpts = [`${desc.includes('normal') && !desc.includes('difusa') ? CHECK : BOX} Normal (Ausente)`, `${desc.includes('difusa') ? CHECK : BOX} Difusa`, `${desc.includes('localizada') ? CHECK : BOX} Localizada`, `${desc.includes('perif') ? CHECK : BOX} Perifolicular`];
+  let dx = MARGIN;
+  for (const o of descOpts) {
+    if (dx + 95 > PAGE_WIDTH - MARGIN) { dx = MARGIN; y -= 10; }
+    page.drawText(`${o}  `, { x: dx, y, size: 8, font: font, color: colors.brand800 });
+    dx += 95;
+  }
+  y -= ROW_H + 4;
+  page.drawText('Coloração:', { x: MARGIN, y, size: 8, font: font, color: colors.brand800 });
+  y -= 10;
+  const col = d('coloracao').toLowerCase();
+  const colOpts = [`${col.includes('castanha') ? CHECK : BOX} Castanha`, `${col.includes('rosa') ? CHECK : BOX} Rosa`, `${col.includes('vermelha') ? CHECK : BOX} Vermelha`, `${col.includes('amarela') ? CHECK : BOX} Amarela`, `${col.includes('branca') ? CHECK : BOX} Branca`, `${col.includes('azul') ? CHECK : BOX} Azul/violáceo`];
+  let cx = MARGIN;
+  for (const o of colOpts) {
+    if (cx + 75 > PAGE_WIDTH - MARGIN) { cx = MARGIN; y -= 10; }
+    page.drawText(`${o}  `, { x: cx, y, size: 8, font: font, color: colors.brand800 });
+    cx += 75;
+  }
+  y -= 20;
+
+  drawBanner('CONCLUSÃO', 14);
+  needsNewPage(60);
+  for (let i = 0; i < 3; i++) {
+    const ln = wrapText(d('conclusao'), 70)[i] || '';
+    if (ln) page.drawText(ln, { x: MARGIN, y, size: 8, font: font, color: colors.brand800 });
+    else drawUnderline(page, MARGIN, y + 2, CONTENT_WIDTH);
+    y -= 12;
+  }
+  y -= 20;
+
+  const declH = 75;
+  needsNewPage(declH + 30);
+  page.drawRectangle({
+    x: MARGIN - 5,
+    y: y - declH,
+    width: CONTENT_WIDTH + 10,
+    height: declH,
+    color: colors.beige,
+    borderColor: colors.brand200,
+    borderWidth: 0.3,
+  });
+  const decl = 'Eu declaro que todas as informações fornecidas nesta ficha são verdadeiras e completas, e autorizo a utilização destes dados para fins de planejamento e execução de tratamentos estéticos na clínica.';
+  const declLines = wrapText(decl, 68);
+  let declY = y - 18;
   for (const ln of declLines) {
-    page.drawText(ln, { x: MARGIN, y: declY, size: 9, font: font, color: colors.brand700 });
+    page.drawText(ln, { x: MARGIN + 5, y: declY, size: 8, font: font, color: colors.brand700 });
     declY -= 11;
   }
-  y = declY - 12;
-  y = drawFieldLine(page, font, fontBold, 'Assinatura do paciente:', MARGIN, y, d('assinatura'));
-  y = drawFieldLine(page, font, fontBold, 'Data:', MARGIN, y, d('data'));
+  y = declY - 15;
+  page.drawText('Assinatura do paciente', { x: MARGIN + 5, y: y + 4, size: 7, font: font, color: colors.brand700 });
+  if (d('assinatura')) page.drawText(d('assinatura'), { x: MARGIN + 5, y: y - 8, size: 8, font: font, color: colors.brand800 });
+  else drawUnderline(page, MARGIN + 5, y - 6, 220);
+  page.drawText('Data', { x: PAGE_WIDTH - MARGIN - 70, y: y + 4, size: 7, font: font, color: colors.brand700 });
+  if (d('data')) page.drawText(d('data'), { x: PAGE_WIDTH - MARGIN - 70, y: y - 8, size: 8, font: font, color: colors.brand800 });
+  else drawUnderline(page, PAGE_WIDTH - MARGIN - 70, y - 6, 55);
+  y -= 25;
 
   for (const p of pages) {
-    p.drawText(`Gerado em ${new Date().toLocaleString('pt-BR')} • Agatha Santos`, {
-      x: MARGIN, y: 22, size: 7, font: font, color: colors.brand200,
-    });
+    p.drawText(`Gerado em ${new Date().toLocaleString('pt-BR')} • Dra. Ágatha`, { x: MARGIN, y: 22, size: 7, font: font, color: colors.brand200 });
   }
 
   const pdfBytes = await pdfDoc.save();

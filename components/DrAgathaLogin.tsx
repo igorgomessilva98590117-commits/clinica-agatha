@@ -28,10 +28,10 @@ const DrAgathaLogin: React.FC<DrAgathaLoginProps> = ({ onSuccess, onClose }) => 
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 safe-area-x overflow-y-auto">
       <div className="bg-brand-50 w-full max-w-md rounded-2xl shadow-xl border border-brand-200 overflow-hidden">
         <div className="bg-brand-500 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-lg font-serif font-medium text-gold-500">Dr Agatha - Área Restrita</h2>
+          <h2 className="text-lg font-serif font-medium text-gold-500">Dra. Ágatha - Área Restrita</h2>
           <button
             onClick={onClose}
             className="text-gold-400 hover:text-gold-300 p-1 transition-colors"

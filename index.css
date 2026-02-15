@@ -1,3 +1,23 @@
+/* Base profissional para clínica */
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+/* Área segura para notch/barra em dispositivos móveis */
+@supports (padding: max(0px)) {
+  .safe-area-top { padding-top: max(1rem, env(safe-area-inset-top)); }
+  .safe-area-bottom { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
+  .safe-area-x { padding-left: max(1rem, env(safe-area-inset-left)); padding-right: max(1rem, env(safe-area-inset-right)); }
+}
+
+/* Inputs touch-friendly em mobile - 16px evita zoom no iOS */
+@media (max-width: 640px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
 /* Desfoque suave nas bordas do logo para transição sem diferença de cor */
 .logo-blend {
   mask-image: radial-gradient(

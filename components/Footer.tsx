@@ -2,10 +2,10 @@ import React from 'react';
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-brand-500 border-t border-gold-500/30 py-8 mt-12">
-      <div className="container mx-auto px-4 text-center">
+    <footer className="bg-brand-500 border-t border-gold-500/30 py-8 mt-12 safe-area-bottom">
+      <div className="container mx-auto px-4 sm:px-6 text-center safe-area-x">
         <p className="text-gold-400 text-sm font-light">
-          &copy; {new Date().getFullYear()} Agatha Santos - Estética Avançada e Tricologia. Todos os direitos reservados.
+          &copy; {new Date().getFullYear()} Dra. Ágatha - Estética Avançada e Tricologia. Todos os direitos reservados.
         </p>
         <div className="mt-2 flex justify-center gap-4 text-xs text-gold-500">
           <span>Ética Médica</span>

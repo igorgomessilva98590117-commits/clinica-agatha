@@ -100,20 +100,20 @@ interface DrAgathaAreaProps {
 
 const TRICOLOGIA_SECTION_IDS = ['dados-pessoais', 'anamnese-capilar', 'historico-saude', 'fisiologia-habitos', 'procedimentos-capilares', 'medicamentos-vicios', 'sono-emocional', 'historico-medico', 'exame-tricoscopia', 'declaracao'];
 
-const inputClass = "w-full min-h-[44px] px-4 py-2.5 rounded-lg border-2 border-brand-200 bg-brand-50 hover:border-brand-300 focus:border-gold-500 focus:ring-2 focus:ring-gold-500/50 outline-none text-brand-800 placeholder:text-brand-400 transition-colors";
+const inputClass = "w-full min-h-[44px] px-4 py-2.5 rounded-lg border-2 border-brand-200 bg-brand-50 hover:border-brand-300 focus:border-gold-500 focus:ring-2 focus:ring-gold-500/50 outline-none text-brand-800 placeholder:text-brand-400 transition-colors text-base";
 
 const Section = ({ id, title, expandedSections, onToggle, children }: { id: string; title: string; expandedSections: Set<string>; onToggle: (id: string) => void; children: React.ReactNode }) => (
-  <div className="border border-brand-200 rounded-xl overflow-hidden mb-4 bg-white">
+  <div className="border border-brand-200 rounded-xl overflow-hidden mb-4 bg-white shadow-sm">
     <button
       type="button"
       onClick={() => onToggle(id)}
-      className="w-full flex items-center justify-between px-6 py-4 bg-brand-50 hover:bg-brand-100 transition-colors text-left"
+      className="w-full flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-brand-50 hover:bg-brand-100 active:bg-brand-100 transition-colors text-left touch-manipulation"
     >
-      <span className="font-serif font-medium text-brand-800">{title}</span>
-      {expandedSections.has(id) ? <ChevronUp className="w-5 h-5 text-gold-600" /> : <ChevronDown className="w-5 h-5 text-gold-600" />}
+      <span className="font-serif font-medium text-brand-800 text-sm sm:text-base">{title}</span>
+      {expandedSections.has(id) ? <ChevronUp className="w-5 h-5 text-gold-600 shrink-0" /> : <ChevronDown className="w-5 h-5 text-gold-600 shrink-0" />}
     </button>
     {expandedSections.has(id) && (
-      <div className="p-6 bg-white border-t border-brand-200 space-y-4" style={{ isolation: 'isolate' }}>
+      <div className="p-4 sm:p-6 bg-white border-t border-brand-200 space-y-4" style={{ isolation: 'isolate' }}>
         {children}
       </div>
     )}
@@ -224,10 +224,10 @@ const DrAgathaArea: React.FC<DrAgathaAreaProps> = ({ onLogout }) => {
 
   const fd = (k: string) => formData[k] ?? '';
 
-  const TricologiaForm = () => (
+  const tricologiaContent = (
     <>
       <div className="mb-8 p-6 bg-brand-500 rounded-2xl text-center">
-        <h1 className="text-2xl font-serif text-gold-500 font-bold mb-1">AGATHA SANTOS</h1>
+        <h1 className="text-2xl font-serif text-gold-500 font-bold mb-1">DRA. ÁGATHA</h1>
         <p className="text-gold-400 text-sm mb-4">ESTÉTICA AVANÇADA E TRICOLOGIA</p>
         <h2 className="text-lg font-serif text-gold-400 font-medium mb-4">FICHA ANAMNESE - TRICOLOGIA</h2>
         <div className="flex justify-center gap-6 text-gold-400 text-sm">
@@ -381,7 +381,7 @@ const DrAgathaArea: React.FC<DrAgathaAreaProps> = ({ onLogout }) => {
     </>
   );
 
-  const ModeloGeralForm = () => (
+  const modeloGeralContent = (
     <>
       <div className="mb-8 text-center">
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-200/50 rounded-lg mb-4">
@@ -410,6 +410,8 @@ const DrAgathaArea: React.FC<DrAgathaAreaProps> = ({ onLogout }) => {
     </>
   );
 
+  const formContent = activeTab === 'tricologia' ? tricologiaContent : modeloGeralContent;
+
   const handleDownloadPdf = async () => {
     try {
       await generateTricologiaAnamnesePdf(formData);
@@ -421,9 +423,9 @@ const DrAgathaArea: React.FC<DrAgathaAreaProps> = ({ onLogout }) => {
 
   return (
     <div className="min-h-screen flex flex-col font-sans bg-brand-100">
-      <header className="bg-brand-500 border-b border-gold-500/30 py-4 px-6">
-        <div className="container mx-auto flex items-center justify-between">
-          <h1 className="text-xl font-serif text-gold-500 font-semibold">Dr Agatha - Área Restrita</h1>
+      <header className="bg-brand-500 border-b border-gold-500/30 py-3 px-4 sm:py-4 sm:px-6 safe-area-top">
+        <div className="container mx-auto flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <h1 className="text-lg sm:text-xl font-serif text-gold-500 font-semibold">Dra. Ágatha - Área Restrita</h1>
           <button
             type="button"
             onClick={onLogout}
@@ -435,8 +437,8 @@ const DrAgathaArea: React.FC<DrAgathaAreaProps> = ({ onLogout }) => {
         </div>
       </header>
 
-      <main className="flex-grow container mx-auto px-4 py-8 max-w-3xl">
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+      <main className="flex-grow container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-3xl safe-area-x">
+        <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-between gap-3 sm:gap-4 mb-6">
           <div className="flex gap-2">
             <button
               type="button"
@@ -465,10 +467,10 @@ const DrAgathaArea: React.FC<DrAgathaAreaProps> = ({ onLogout }) => {
           )}
         </div>
 
-        {activeTab === 'tricologia' ? <TricologiaForm /> : <ModeloGeralForm />}
+        {formContent}
 
         <p className="text-center text-xs text-brand-500 mt-8">
-          Agatha Santos - Estética Avançada e Tricologia
+          Dra. Ágatha - Estética Avançada e Tricologia
         </p>
       </main>
     </div>
