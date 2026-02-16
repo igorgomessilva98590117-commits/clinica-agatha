@@ -398,8 +398,8 @@ function drawTricologiaHeader(page: any, font: any, fontBold: any, startY: numbe
   return startY - headerH - 15;
 }
 
-function drawUnderline(page: any, x: number, y: number, len: number, color = colors.lineGray) {
-  page.drawLine({ start: { x, y }, end: { x: x + len, y }, thickness: 0.4, color });
+function drawUnderline(page: any, x: number, y: number, len: number, color = colors.lineGray, thickness = 0.4) {
+  page.drawLine({ start: { x, y }, end: { x: x + len, y }, thickness, color });
 }
 
 const ROW_H = 14;
@@ -747,7 +747,7 @@ export async function generateTricologiaAnamnesePdf(formData: Record<string, str
   }
   y -= 20;
 
-  const declH = 75;
+  const declH = 145;
   needsNewPage(declH + 30);
   page.drawRectangle({
     x: MARGIN - 5,
@@ -756,23 +756,49 @@ export async function generateTricologiaAnamnesePdf(formData: Record<string, str
     height: declH,
     color: colors.beige,
     borderColor: colors.brand200,
-    borderWidth: 0.3,
+    borderWidth: 0.2,
   });
   const decl = 'Eu declaro que todas as informações fornecidas nesta ficha são verdadeiras e completas, e autorizo a utilização destes dados para fins de planejamento e execução de tratamentos estéticos na clínica.';
-  const declLines = wrapText(decl, 68);
-  let declY = y - 18;
+  const declLines = wrapText(decl, 92);
+  let declY = y - 20;
   for (const ln of declLines) {
-    page.drawText(ln, { x: MARGIN + 5, y: declY, size: 8, font: font, color: colors.brand700 });
-    declY -= 11;
+    page.drawText(ln, { x: MARGIN + 8, y: declY, size: 8, font: font, color: colors.brand700 });
+    declY -= 12;
   }
-  y = declY - 15;
-  page.drawText('Assinatura do paciente', { x: MARGIN + 5, y: y + 4, size: 7, font: font, color: colors.brand700 });
-  if (d('assinatura')) page.drawText(d('assinatura'), { x: MARGIN + 5, y: y - 8, size: 8, font: font, color: colors.brand800 });
-  else drawUnderline(page, MARGIN + 5, y - 6, 220);
-  page.drawText('Data', { x: PAGE_WIDTH - MARGIN - 70, y: y + 4, size: 7, font: font, color: colors.brand700 });
-  if (d('data')) page.drawText(d('data'), { x: PAGE_WIDTH - MARGIN - 70, y: y - 8, size: 8, font: font, color: colors.brand800 });
-  else drawUnderline(page, PAGE_WIDTH - MARGIN - 70, y - 6, 55);
-  y -= 25;
+  const declLineColor = rgb(0.5, 0.45, 0.42);
+  const sigX = MARGIN + 8;
+  const sigW = 210;
+  const sigH = 40;
+  const lineY = declY - 50;
+  drawUnderline(page, sigX, lineY, sigW, declLineColor, 0.3);
+  page.drawText('Assinatura do paciente', { x: sigX, y: lineY - 12, size: 7, font: font, color: colors.brand700 });
+  const assinaturaVal = d('assinatura');
+  if (assinaturaVal?.startsWith('data:image/png;base64,')) {
+    try {
+      const base64 = assinaturaVal.split(',')[1];
+      if (base64) {
+        const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+        const img = await pdfDoc.embedPng(bytes);
+        const maxW = sigW - 8;
+        const maxH = sigH;
+        const scale = Math.min(maxW / img.width, maxH / img.height, 1);
+        const w = img.width * scale;
+        const h = img.height * scale;
+        const imgX = sigX + (sigW - w) / 2;
+        const imgY = lineY + 4;
+        page.drawImage(img, { x: imgX, y: imgY, width: w, height: h });
+      }
+    } catch {
+      // fallback: line already drawn
+    }
+  } else if (assinaturaVal) {
+    page.drawText(assinaturaVal, { x: sigX, y: lineY + 4, size: 8, font: font, color: colors.brand800 });
+  }
+  const dataX = PAGE_WIDTH - MARGIN - 65;
+  drawUnderline(page, dataX, lineY, 58, declLineColor, 0.3);
+  page.drawText('Data', { x: dataX, y: lineY - 12, size: 7, font: font, color: colors.brand700 });
+  if (d('data')) page.drawText(d('data'), { x: dataX, y: lineY + 2, size: 8, font: font, color: colors.brand800 });
+  y = lineY - 24;
 
   for (const p of pages) {
     p.drawText(`Gerado em ${new Date().toLocaleString('pt-BR')} • Ágatha Santos`, { x: MARGIN, y: 22, size: 7, font: font, color: colors.brand200 });
