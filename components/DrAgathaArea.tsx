@@ -1,6 +1,7 @@
 import React, { useState, useId } from 'react';
 import { LogOut, FileText, ChevronDown, ChevronUp, Phone, Instagram, Download } from 'lucide-react';
 import { generateTricologiaAnamnesePdf } from '../utils/pdfGenerator';
+import { SignaturePad } from './SignaturePad';
 
 export interface TricologiaFormData {
   [key: string]: string;
@@ -374,7 +375,7 @@ const DrAgathaArea: React.FC<DrAgathaAreaProps> = ({ onLogout }) => {
           &quot;Eu declaro que todas as informações fornecidas nesta ficha são verdadeiras e completas, e autorizo a utilização destes dados para fins de planejamento e execução de tratamentos estéticos na clínica.&quot;
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field id="assinatura" label="Assinatura do paciente" placeholder="Nome para assinatura" value={fd('assinatura')} onChange={updateField} />
+          <SignaturePad label="Assinatura do paciente" value={fd('assinatura')} onChange={(v) => updateField('assinatura', v)} height={120} />
           <Field id="data" label="Data" type="date" value={fd('data')} onChange={updateField} />
         </div>
       </Section>
