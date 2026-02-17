@@ -115,9 +115,9 @@ export const SignaturePad: React.FC<SignaturePadProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const rect = container.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
     ctx.fillStyle = '#fdf3f5';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, canvas.width / dpr, canvas.height / dpr);
     onChange('');
   };
 

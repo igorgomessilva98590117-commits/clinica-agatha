@@ -47,7 +47,6 @@ const AnamnesisForm: React.FC = () => {
 
     // Simulate API call
     setTimeout(() => {
-      console.log('Form Submitted:', formData);
       setIsSubmitting(false);
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });

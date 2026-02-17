@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# PDFs gerados localmente
+modelo-ficha.pdf

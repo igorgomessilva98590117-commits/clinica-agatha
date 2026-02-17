@@ -41,7 +41,6 @@ const SkinManagementForm: React.FC = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setTimeout(() => {
-      console.log('Skin Management Form:', formData);
       setIsSubmitting(false);
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
