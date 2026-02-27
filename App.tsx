@@ -28,13 +28,13 @@ const serviceConfig: Record<ServiceType, { title: string; description: string }>
   },
 };
 
-const SESSION_KEY = 'dr_agatha_logged_in';
+const LOGIN_KEY = 'dr_agatha_logged_in';
 
 const App: React.FC = () => {
   const [activeService, setActiveService] = useState<ServiceType>('tricologia');
   const [showDrAgathaLogin, setShowDrAgathaLogin] = useState(false);
   const [isDrAgathaLoggedIn, setIsDrAgathaLoggedIn] = useState(() => {
-    return sessionStorage.getItem(SESSION_KEY) === '1';
+    return localStorage.getItem(LOGIN_KEY) === '1';
   });
 
   const config = serviceConfig[activeService];
@@ -50,12 +50,12 @@ const App: React.FC = () => {
   const handleDrAgathaLoginSuccess = () => {
     setShowDrAgathaLogin(false);
     setIsDrAgathaLoggedIn(true);
-    sessionStorage.setItem(SESSION_KEY, '1');
+    localStorage.setItem(LOGIN_KEY, '1');
   };
 
   const handleDrAgathaLogout = () => {
     setIsDrAgathaLoggedIn(false);
-    sessionStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem(LOGIN_KEY);
   };
 
   if (isDrAgathaLoggedIn) {

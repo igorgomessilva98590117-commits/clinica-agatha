@@ -1,57 +1,33 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { FileSpreadsheet } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import type { Expense } from '../../utils/expenseTypes';
 import { CATEGORY_LABELS } from '../../utils/expenseTypes';
-import { MOCK_EXPENSES } from '../../utils/mockExpenses';
+import { fetchExpenses, addExpense as addExpenseToDb, deleteExpense as deleteExpenseFromDb } from '../../utils/expenseService';
 import { FinanceCharts } from './FinanceCharts';
 import { FinanceExpenseForm } from './FinanceExpenseForm';
 import { FinanceExpenseTable } from './FinanceExpenseTable';
 
-const STORAGE_KEY = 'clinica_agatha_gastos';
-
-function loadExpenses(): Expense[] {
-  try {
-    if (typeof localStorage === 'undefined') return [...MOCK_EXPENSES];
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw) as Expense[];
-      if (Array.isArray(parsed)) return parsed;
-    }
-  } catch {
-    /* erro ao ler (dados corrompidos, etc) - não sobrescrever */
-  }
-  return [...MOCK_EXPENSES];
-}
-
-function generateId(): string {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2);
-}
-
-function saveExpenses(data: Expense[]) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  } catch {
-    /* localStorage indisponível (modo privado, quota excedida, etc) */
-  }
-}
-
 export const FinanceDashboard: React.FC = () => {
-  const [expenses, setExpenses] = useState<Expense[]>(loadExpenses);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchExpenses().then((data) => {
+      setExpenses(data);
+      setLoading(false);
+    });
+  }, []);
 
   const addExpense = useCallback((e: Omit<Expense, 'id'>) => {
-    setExpenses((prev) => {
-      const next = [...prev, { ...e, id: generateId() }];
-      saveExpenses(next);
-      return next;
+    addExpenseToDb(e).then((added) => {
+      if (added) setExpenses((prev) => [...prev, added]);
     });
   }, []);
 
   const deleteExpense = useCallback((id: string) => {
-    setExpenses((prev) => {
-      const next = prev.filter((x) => x.id !== id);
-      saveExpenses(next);
-      return next;
+    deleteExpenseFromDb(id).then((ok) => {
+      if (ok) setExpenses((prev) => prev.filter((x) => x.id !== id));
     });
   }, []);
 
@@ -83,6 +59,14 @@ export const FinanceDashboard: React.FC = () => {
     XLSX.utils.book_append_sheet(wb, ws, 'Gastos');
     XLSX.writeFile(wb, `gastos_clinica_${new Date().toISOString().slice(0, 10)}.xlsx`);
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-6 max-w-5xl mx-auto">
+        <p className="text-center text-brand-600 py-12">Carregando gastos...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
