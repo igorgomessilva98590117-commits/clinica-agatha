@@ -2,6 +2,7 @@ import React, { useState, useId } from 'react';
 import { LogOut, FileText, ChevronDown, ChevronUp, Phone, Instagram, Download } from 'lucide-react';
 import { generateTricologiaAnamnesePdf } from '../utils/pdfGenerator';
 import { SignaturePad } from './SignaturePad';
+import { FinanceDashboard } from './finance/FinanceDashboard';
 
 export interface TricologiaFormData {
   [key: string]: string;
@@ -207,7 +208,7 @@ const CheckMulti = ({ id, label, options, value, onChange }: { id: string; label
 
 const DrAgathaArea: React.FC<DrAgathaAreaProps> = ({ onLogout }) => {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(() => new Set(TRICOLOGIA_SECTION_IDS));
-  const [activeTab, setActiveTab] = useState<'tricologia' | 'geral'>('tricologia');
+  const [activeTab, setActiveTab] = useState<'tricologia' | 'geral' | 'financas'>('tricologia');
   const [formData, setFormData] = useState<TricologiaFormData>(INITIAL_TRICOLOGIA_DATA);
 
   const updateField = (key: string, value: string) => {
@@ -411,7 +412,7 @@ const DrAgathaArea: React.FC<DrAgathaAreaProps> = ({ onLogout }) => {
     </>
   );
 
-  const formContent = activeTab === 'tricologia' ? tricologiaContent : modeloGeralContent;
+  const formContent = activeTab === 'financas' ? <FinanceDashboard /> : activeTab === 'tricologia' ? tricologiaContent : modeloGeralContent;
 
   const handleDownloadPdf = async () => {
     try {
@@ -438,7 +439,7 @@ const DrAgathaArea: React.FC<DrAgathaAreaProps> = ({ onLogout }) => {
         </div>
       </header>
 
-      <main className="flex-grow container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-3xl safe-area-x">
+      <main className={`flex-grow container mx-auto px-4 sm:px-6 py-6 sm:py-8 safe-area-x ${activeTab === 'financas' ? 'max-w-6xl' : 'max-w-3xl'}`}>
         <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-between gap-3 sm:gap-4 mb-6">
           <div className="flex gap-2">
             <button
@@ -455,6 +456,13 @@ const DrAgathaArea: React.FC<DrAgathaAreaProps> = ({ onLogout }) => {
             >
               Modelo Geral
             </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('financas')}
+              className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${activeTab === 'financas' ? 'bg-brand-500 text-gold-500' : 'bg-brand-200 text-brand-700 hover:bg-brand-300'}`}
+            >
+              Finanças
+            </button>
           </div>
           {activeTab === 'tricologia' && (
             <button
@@ -470,9 +478,11 @@ const DrAgathaArea: React.FC<DrAgathaAreaProps> = ({ onLogout }) => {
 
         {formContent}
 
-        <p className="text-center text-xs text-brand-500 mt-8">
-          Ágatha Santos - Estética Avançada e Tricologia
-        </p>
+        {activeTab !== 'financas' && (
+          <p className="text-center text-xs text-brand-500 mt-8">
+            Ágatha Santos - Estética Avançada e Tricologia
+          </p>
+        )}
       </main>
     </div>
   );
