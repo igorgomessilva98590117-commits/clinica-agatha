@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { FileSpreadsheet } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import type { Expense } from '../../utils/expenseTypes';
@@ -12,34 +12,47 @@ const STORAGE_KEY = 'clinica_agatha_gastos';
 
 function loadExpenses(): Expense[] {
   try {
+    if (typeof localStorage === 'undefined') return [...MOCK_EXPENSES];
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as Expense[];
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed)) return parsed;
     }
   } catch {
-    /* ignorar */
+    /* erro ao ler (dados corrompidos, etc) - não sobrescrever */
   }
-  return MOCK_EXPENSES;
+  return [...MOCK_EXPENSES];
 }
 
 function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2);
 }
 
+function saveExpenses(data: Expense[]) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch {
+    /* localStorage indisponível (modo privado, quota excedida, etc) */
+  }
+}
+
 export const FinanceDashboard: React.FC = () => {
   const [expenses, setExpenses] = useState<Expense[]>(loadExpenses);
 
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
-  }, [expenses]);
-
   const addExpense = useCallback((e: Omit<Expense, 'id'>) => {
-    setExpenses((prev) => [...prev, { ...e, id: generateId() }]);
+    setExpenses((prev) => {
+      const next = [...prev, { ...e, id: generateId() }];
+      saveExpenses(next);
+      return next;
+    });
   }, []);
 
   const deleteExpense = useCallback((id: string) => {
-    setExpenses((prev) => prev.filter((x) => x.id !== id));
+    setExpenses((prev) => {
+      const next = prev.filter((x) => x.id !== id);
+      saveExpenses(next);
+      return next;
+    });
   }, []);
 
   const byCategory: Record<string, number> = {};
