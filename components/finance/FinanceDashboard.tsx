@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { FileSpreadsheet } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import type { Expense } from '../../utils/expenseTypes';
@@ -8,12 +8,31 @@ import { FinanceCharts } from './FinanceCharts';
 import { FinanceExpenseForm } from './FinanceExpenseForm';
 import { FinanceExpenseTable } from './FinanceExpenseTable';
 
+const STORAGE_KEY = 'clinica_agatha_gastos';
+
+function loadExpenses(): Expense[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as Expense[];
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch {
+    /* ignorar */
+  }
+  return MOCK_EXPENSES;
+}
+
 function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2);
 }
 
 export const FinanceDashboard: React.FC = () => {
-  const [expenses, setExpenses] = useState<Expense[]>(MOCK_EXPENSES);
+  const [expenses, setExpenses] = useState<Expense[]>(loadExpenses);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
+  }, [expenses]);
 
   const addExpense = useCallback((e: Omit<Expense, 'id'>) => {
     setExpenses((prev) => [...prev, { ...e, id: generateId() }]);
@@ -23,13 +42,16 @@ export const FinanceDashboard: React.FC = () => {
     setExpenses((prev) => prev.filter((x) => x.id !== id));
   }, []);
 
-  const total = expenses.reduce((s, e) => s + e.amount, 0);
-  const count = expenses.length;
   const byCategory: Record<string, number> = {};
   expenses.forEach((e) => { byCategory[e.category] = (byCategory[e.category] || 0) + e.amount; });
-  const topCategoryKey = Object.entries(byCategory).sort((a, b) => b[1] - a[1])[0]?.[0];
+  const categoryValues = Object.values(byCategory).map((v) => Math.round(v * 100) / 100);
+  const total = categoryValues.reduce((s, v) => s + v, 0);
+  const count = expenses.length;
+  const topEntry = Object.entries(byCategory).sort((a, b) => b[1] - a[1])[0];
+  const topCategoryKey = topEntry?.[0];
   const topCategoryLabel = topCategoryKey ? CATEGORY_LABELS[topCategoryKey as keyof typeof CATEGORY_LABELS] : '-';
-  const monthlyAvg = count > 0 ? total / Math.max(1, new Set(expenses.map((e) => e.date.slice(0, 7))).size) : 0;
+  const uniqueMonths = new Set(expenses.map((e) => e.date.slice(0, 7)));
+  const monthlyAvg = count > 0 ? total / Math.max(1, uniqueMonths.size) : 0;
 
   const handleExportExcel = () => {
     const rows = [
