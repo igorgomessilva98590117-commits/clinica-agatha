@@ -12,6 +12,7 @@ import { FinanceExpenseTable } from './FinanceExpenseTable';
 export const FinanceDashboard: React.FC = () => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
+  const [addError, setAddError] = useState('');
 
   useEffect(() => {
     fetchExpenses().then((data) => {
@@ -23,8 +24,10 @@ export const FinanceDashboard: React.FC = () => {
   }, []);
 
   const addExpense = useCallback((e: Omit<Expense, 'id'>) => {
-    addExpenseToDb(e).then((added) => {
-      if (added) setExpenses((prev) => [...prev, added]);
+    setAddError('');
+    addExpenseToDb(e).then(({ data, error }) => {
+      if (data) setExpenses((prev) => [...prev, data]);
+      if (error) setAddError(error);
     });
   }, []);
 
@@ -110,6 +113,9 @@ export const FinanceDashboard: React.FC = () => {
       </div>
 
       <FinanceCharts expenses={expenses} />
+      {addError && (
+        <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2" role="alert">{addError}</p>
+      )}
       <FinanceExpenseForm onAdd={addExpense} />
       <FinanceExpenseTable expenses={expenses} onDelete={deleteExpense} />
     </div>

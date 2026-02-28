@@ -14,4 +14,9 @@ CREATE TABLE IF NOT EXISTS gastos (
 GRANT ALL ON gastos TO anon;
 GRANT ALL ON gastos TO authenticated;
 
+-- Permite anon inserir, ler, atualizar e apagar (conta momo compartilhada)
+ALTER TABLE gastos ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "gastos_anon_all" ON gastos;
+CREATE POLICY "gastos_anon_all" ON gastos FOR ALL TO anon USING (true) WITH CHECK (true);
+
 -- Realtime: vá em Database > Replication no Supabase e habilite a tabela "gastos"

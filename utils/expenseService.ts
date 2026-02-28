@@ -45,7 +45,7 @@ export async function fetchExpenses(): Promise<Expense[]> {
   return stored.length > 0 ? stored : [...MOCK_EXPENSES];
 }
 
-export async function addExpense(expense: Omit<Expense, 'id'>): Promise<Expense | null> {
+export async function addExpense(expense: Omit<Expense, 'id'>): Promise<{ data: Expense | null; error?: string }> {
   if (hasSupabase && supabase) {
     const { data, error } = await supabase
       .from('gastos')
@@ -57,15 +57,15 @@ export async function addExpense(expense: Omit<Expense, 'id'>): Promise<Expense 
       })
       .select('id,description,amount,category,date')
       .single();
-    if (!error && data) return dbToExpense(data);
-    return null;
+    if (!error && data) return { data: dbToExpense(data) };
+    return { data: null, error: error?.message ?? 'Erro ao salvar' };
   }
   const id = Date.now().toString(36) + Math.random().toString(36).slice(2);
   const newExpense: Expense = { ...expense, id };
   const stored = loadFromStorage();
   stored.push(newExpense);
   saveToStorage(stored);
-  return newExpense;
+  return { data: newExpense };
 }
 
 export async function deleteExpense(id: string): Promise<boolean> {
