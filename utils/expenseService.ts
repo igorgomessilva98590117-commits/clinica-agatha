@@ -78,3 +78,12 @@ export async function deleteExpense(id: string): Promise<boolean> {
   saveToStorage(next);
   return true;
 }
+
+export function subscribeToExpenses(onChange: () => void): (() => void) | null {
+  if (!hasSupabase || !supabase) return null;
+  const channel = supabase
+    .channel('gastos-sync')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'gastos' }, () => onChange())
+    .subscribe();
+  return () => channel.unsubscribe();
+}

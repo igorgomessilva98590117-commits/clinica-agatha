@@ -46,6 +46,15 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 3. Reinicie o servidor de desenvolvimento (`npm run dev`)
 
+**No Vercel:** adicione as mesmas variáveis em Settings → Environment Variables.
+
+## 6. Sincronização em tempo real (opcional)
+
+Para que adições/remoções apareçam em todas as sessões (Vercel, celular, etc) sem recarregar:
+
+1. No Supabase, vá em **Database** → **Replication**
+2. Habilite a tabela **gastos** para Realtime
+
 ## Pronto
 
-Os gastos passam a ser salvos no Supabase. Se o `.env` não estiver configurado, o app continua usando o localStorage normalmente.
+Os gastos passam a ser salvos no Supabase. Qualquer pessoa logada com a conta momo vê os mesmos dados. Se o `.env` não estiver configurado, o app continua usando o localStorage normalmente.

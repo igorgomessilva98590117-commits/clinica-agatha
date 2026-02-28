@@ -13,3 +13,5 @@ CREATE TABLE IF NOT EXISTS gastos (
 -- Garante acesso via API
 GRANT ALL ON gastos TO anon;
 GRANT ALL ON gastos TO authenticated;
+
+-- Realtime: vá em Database > Replication no Supabase e habilite a tabela "gastos"

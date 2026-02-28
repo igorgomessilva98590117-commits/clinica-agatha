@@ -3,7 +3,8 @@ import { FileSpreadsheet } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import type { Expense } from '../../utils/expenseTypes';
 import { CATEGORY_LABELS } from '../../utils/expenseTypes';
-import { fetchExpenses, addExpense as addExpenseToDb, deleteExpense as deleteExpenseFromDb } from '../../utils/expenseService';
+import { hasSupabase } from '../../utils/supabase';
+import { fetchExpenses, addExpense as addExpenseToDb, deleteExpense as deleteExpenseFromDb, subscribeToExpenses } from '../../utils/expenseService';
 import { FinanceCharts } from './FinanceCharts';
 import { FinanceExpenseForm } from './FinanceExpenseForm';
 import { FinanceExpenseTable } from './FinanceExpenseTable';
@@ -17,6 +18,8 @@ export const FinanceDashboard: React.FC = () => {
       setExpenses(data);
       setLoading(false);
     });
+    const unsub = subscribeToExpenses(() => fetchExpenses().then(setExpenses));
+    return () => unsub?.();
   }, []);
 
   const addExpense = useCallback((e: Omit<Expense, 'id'>) => {
@@ -71,7 +74,12 @@ export const FinanceDashboard: React.FC = () => {
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h2 className="text-xl font-serif font-semibold text-brand-800">Controle de gastos</h2>
+        <div>
+          <h2 className="text-xl font-serif font-semibold text-brand-800">Controle de gastos</h2>
+          {!hasSupabase && (
+            <p className="text-xs text-amber-600 mt-0.5">Dados locais — celular e PC não sincronizam. Adicione as variáveis Supabase no Vercel.</p>
+          )}
+        </div>
         <button
           type="button"
           onClick={handleExportExcel}
